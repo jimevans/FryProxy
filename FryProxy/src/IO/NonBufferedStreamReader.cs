@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
 
-namespace FryProxy.Utils {
+namespace FryProxy.IO {
 
-    internal class PlainStreamReader : TextReader {
+    internal class NonBufferedStreamReader : TextReader {
 
         private const Int32 EmptyBuffer = Int32.MinValue;
         private int _lastPeek = EmptyBuffer;
         private int _lastRead = EmptyBuffer;
         private readonly Stream _stream;
 
-        public PlainStreamReader(Stream stream) {
+        public NonBufferedStreamReader(Stream stream) {
             _stream = stream;
         }
 

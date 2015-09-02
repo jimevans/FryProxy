@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using FryProxy.Headers;
-using FryProxy.Readers;
+using FryProxy.IO;
 using FryProxy.Utils;
 using log4net;
 
@@ -13,9 +13,9 @@ namespace FryProxy.Writers
     /// <summary>
     ///     Writes HTTP message to underlying stream
     /// </summary>
-    public class HttpMessageWriter
+    public class HttpContentWriter
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof (HttpMessageWriter));
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof (HttpContentWriter));
 
         protected const Int32 BufferSize = 8192;
 
@@ -25,7 +25,7 @@ namespace FryProxy.Writers
         ///     Creates new writer instance, writing to provided stream
         /// </summary>
         /// <param name="outputStream">stream which will be written to</param>
-        public HttpMessageWriter(Stream outputStream)
+        public HttpContentWriter(Stream outputStream)
         {
             if (outputStream == null)
             {
@@ -119,7 +119,7 @@ namespace FryProxy.Writers
         /// <param name="body">chunked HTTP message body</param>
         protected virtual void CopyChunkedMessageBody(Stream body)
         {
-            var reader = new HttpHeaderReader(new PlainStreamReader(body));
+            var reader = new HttpHeaderReader(new NonBufferedStreamReader(body));
 
             var writer = new StreamWriter(OutputStream, Encoding.ASCII);
 

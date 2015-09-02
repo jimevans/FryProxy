@@ -89,7 +89,7 @@ namespace FryProxy.Tests.Writers
         {
             var outputStream = new MemoryStream();
 
-            var httpWriter = new HttpMessageWriter(outputStream);
+            var httpWriter = new HttpContentWriter(outputStream);
 
             httpWriter.Write(header, body, bodyLength);
 

@@ -5,7 +5,7 @@ using System.IO;
 using FryProxy.Headers;
 using log4net;
 
-namespace FryProxy.Readers
+namespace FryProxy.IO
 {
     /// <summary>
     ///     Read HTTP message entities from underlying reader
@@ -25,6 +25,8 @@ namespace FryProxy.Readers
         {
             _reader = reader;
         }
+
+        public HttpHeaderReader(Stream stream) : this(new NonBufferedStreamReader(stream)) { }
 
         /// <summary>
         ///     Read next not empty line.

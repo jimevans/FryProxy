@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using FryProxy.Readers;
+using FryProxy.IO;
 using NUnit.Framework;
 
 namespace FryProxy.Tests.Readers

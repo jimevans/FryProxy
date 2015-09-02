@@ -6,10 +6,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using FryProxy.Headers;
-using FryProxy.Readers;
+using FryProxy.IO;
 using FryProxy.Utils;
 using FryProxy.Writers;
 using log4net;
+using HttpContentWriter = FryProxy.Writers.HttpContentWriter;
 using HttpRequestHeader = FryProxy.Headers.HttpRequestHeader;
 using HttpResponseHeader = FryProxy.Headers.HttpResponseHeader;
 
@@ -208,7 +209,7 @@ namespace FryProxy
             Contract.Requires<ArgumentNullException>(context != null, "context");
             Contract.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
 
-            var headerReader = new HttpHeaderReader(new PlainStreamReader(context.ClientStream));
+            var headerReader = new HttpHeaderReader(new NonBufferedStreamReader(context.ClientStream));
 
             try
             {
@@ -297,8 +298,8 @@ namespace FryProxy
             Contract.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
             Contract.Requires<InvalidContextException>(context.ClientSocket != null, "ClientSocket");
 
-            var requestWriter = new HttpMessageWriter(context.ServerStream);
-            var responseReader = new HttpHeaderReader(new PlainStreamReader(context.ServerStream));
+            var requestWriter = new HttpContentWriter(context.ServerStream);
+            var responseReader = new HttpHeaderReader(new NonBufferedStreamReader(context.ServerStream));
 
             try
             {

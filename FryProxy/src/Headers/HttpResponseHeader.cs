@@ -32,7 +32,7 @@ namespace FryProxy.Headers {
             StartLine = base.StartLine;
         }
 
-        public HttpResponseHeader(Int32 statusCode, String statusMessage, String version)
+        public HttpResponseHeader(Int32 statusCode, String statusMessage, String version = "1.1")
         {
             StatusCode = statusCode;
             Reason = statusMessage;

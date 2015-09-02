@@ -7,7 +7,7 @@ namespace FryProxy.Writers
     /// <summary>
     ///     Message writer with capability to write specific types of HTTP response
     /// </summary>
-    public class HttpResponseWriter : HttpMessageWriter
+    public class HttpResponseWriter : HttpContentWriter
     {
         private const String DefaultHttpVersion = "1.1";
 

@@ -8,7 +8,7 @@ using HttpRequestHeader = FryProxy.Headers.HttpRequestHeader;
 
 namespace FryProxy.Handlers
 {
-    internal class DefaultSocketConnector : LoggingRequestHandler, IRemoteSocketConnector
+    internal class DefaultSocketConnector : RequestHandlerSkeleton, IRemoteSocketConnector
     {
         private static readonly Regex HostAndPortRegex = new Regex(@"(?<host>\w+):(?<port>\d+)");
 
