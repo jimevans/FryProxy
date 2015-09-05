@@ -7,17 +7,21 @@ namespace FryProxy.Messages
 {
     public class HttpResponseMessage : HttpMessage
     {
-        public HttpResponseMessage(HttpResponseHeader header) : base(header)
+        public HttpResponseMessage()
         {
         }
 
-        public HttpResponseMessage(HttpResponseHeader header, Stream body) : base(header, body)
+        public HttpResponseMessage(HttpResponseHeader messageHeader) : base(messageHeader)
+        {
+        }
+
+        public HttpResponseMessage(HttpResponseHeader messageHeader, Stream body) : base(messageHeader, body)
         {
         }
 
         public HttpResponseHeader ResponseHeader
         {
-            get { return Header as HttpResponseHeader; }
+            get { return MessageHeader as HttpResponseHeader; }
         }
 
         public Boolean IsRedirect
@@ -38,6 +42,11 @@ namespace FryProxy.Messages
             }
 
             base.WriteBody(writer);
+        }
+
+        protected override HttpMessageHeader ReadHeader(Stream stream)
+        {
+            return new HttpResponseHeader(base.ReadHeader(stream));
         }
     }
 }

@@ -29,22 +29,5 @@ namespace FryProxy.Utils
 
             return false;
         }
-
-        public static SocketException AsSocketException(this Exception exception)
-        {
-            for (; exception != null; exception = exception.InnerException)
-            {
-                var socketException = exception as SocketException;
-
-                if (socketException == null)
-                {
-                    continue;
-                }
-
-                return socketException;
-            }
-
-            return null;
-        }
     }
 }

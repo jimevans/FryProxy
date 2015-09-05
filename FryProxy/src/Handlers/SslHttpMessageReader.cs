@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using FryProxy.Headers;
-using FryProxy.Writers;
+using FryProxy.Messages;
 
 namespace FryProxy.Handlers
 {
@@ -14,6 +13,8 @@ namespace FryProxy.Handlers
 
         private readonly RemoteCertificateValidationCallback _certificateValidationCallback;
 
+        private readonly HttpResponseMessage _connectionEstablished = new ConnectionEstablishedMessage();
+
         public SslHttpMessageReader(X509Certificate certificate,
             RemoteCertificateValidationCallback certificateValidationCallback)
         {
@@ -21,25 +22,20 @@ namespace FryProxy.Handlers
             _certificateValidationCallback = certificateValidationCallback;
         }
 
-        public override Tuple<HttpRequestHeader, Stream> ReadHttpRequest(Stream stream)
+        public override void ReadHttpRequest(HttpRequestMessage message, Stream stream)
         {
-            Tuple<HttpRequestHeader, Stream> plainHttpRequest = base.ReadHttpRequest(stream);
+            base.ReadHttpRequest(message, stream);
 
-            if (plainHttpRequest == null)
+            if (message.RequestMethod != RequestMethodTypes.CONNECT)
             {
-                throw new RequestAbortedException("Read Failed");
-            }
-
-            if (plainHttpRequest.Item1.MethodType != RequestMethodTypes.CONNECT)
-            {
-                return plainHttpRequest;
+                return;
             }
 
             var sslStream = new SslStream(stream, false, _certificateValidationCallback);
 
             try
             {
-                new HttpResponseWriter(stream).WriteConnectionEstablished();
+                _connectionEstablished.Write(stream);
                 sslStream.AuthenticateAsServer(_certificate, false, SslProtocols.Tls, false);
             }
             catch (IOException ex)
@@ -50,7 +46,7 @@ namespace FryProxy.Handlers
                 }
             }
 
-            return base.ReadHttpRequest(sslStream);
+            base.ReadHttpRequest(message, sslStream);
         }
     }
 }

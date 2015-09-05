@@ -4,7 +4,8 @@ using System.Text;
 
 namespace FryProxy.Headers {
 
-    public class HttpMessageHeader {
+    public class HttpMessageHeader : IHttpMessageHeader
+    {
 
         private const String ChunkedTransferEncoding = "chunked";
 

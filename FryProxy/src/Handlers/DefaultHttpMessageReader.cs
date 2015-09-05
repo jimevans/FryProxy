@@ -2,77 +2,57 @@
 using System.Diagnostics.Contracts;
 using System.IO;
 using FryProxy.Headers;
-using FryProxy.IO;
+using FryProxy.Messages;
 using FryProxy.Utils;
 
 namespace FryProxy.Handlers
 {
-    internal class DefaultHttpMessageReader : RequestHandlerSkeleton, IHttpMessageReader
+    internal class DefaultHttpMessageReader : HandlerSkeleton, IHttpMessageReader
     {
-        public virtual Tuple<HttpRequestHeader, Stream> ReadHttpRequest(Stream stream)
+        public virtual void ReadHttpRequest(HttpRequestMessage message, Stream stream)
         {
-            Contract.Requires<ArgumentNullException>(stream != null, "stream");
-            Contract.Requires<ArgumentException>(stream.CanRead, "stream");
-
-            HttpRequestHeader requestHeader = null;
-
-            try
-            {
-                requestHeader = new HttpRequestHeader(ReadHttpMessageHeader(stream));
-
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.DebugFormat("Request Received. {0}", TraceUtils.GetHttpTrace(requestHeader));
-                }
-
-                if (requestHeader.Headers.Contains(GeneralHeaders.ProxyConnectionHeader))
-                {
-                    requestHeader.Headers.Remove(GeneralHeaders.ProxyConnectionHeader);
-                }
-
-                requestHeader.GeneralHeaders.Connection = "close";
-            }
-            catch (IOException ex)
-            {
-                if (!HandleSocketException(ex))
-                {
-                    throw;
-                }
-            }
-
-            return Tuple.Create(requestHeader, stream);
-        }
-
-        public Tuple<HttpResponseHeader, Stream> ReadHttpResponse(Stream stream)
-        {
-            Contract.Requires<ArgumentNullException>(stream != null, "stream");
-            Contract.Requires<ArgumentException>(stream.CanRead, "stream");
-
-            HttpResponseHeader header = null;
-
-            try
-            {
-                header = new HttpResponseHeader(ReadHttpMessageHeader(stream));
-            }
-            catch (IOException ex)
-            {
-                if (!HandleSocketException(ex))
-                {
-                    throw;
-                }
-            }
+            ReadHttpMessage(message, stream);
 
             if (Logger.IsDebugEnabled)
             {
-                Logger.DebugFormat("Response Received: {0}", TraceUtils.GetHttpTrace(header));
+                Logger.DebugFormat("Request Received. {0}", TraceUtils.GetHttpTrace(message.MessageHeader));
             }
 
-            return Tuple.Create(header, stream);
+            if (message.Headers.Contains(GeneralHeaders.ProxyConnectionHeader))
+            {
+                message.Headers.Remove(GeneralHeaders.ProxyConnectionHeader);
+            }
+
+            message.GeneralHeaders.Connection = "close";
         }
 
-        private static HttpMessageHeader ReadHttpMessageHeader(Stream stream)
+        public void ReadHttpResponse(HttpResponseMessage message, Stream stream)
         {
-            return new HttpHeaderReader(new NonBufferedStreamReader(stream)).ReadHttpMessageHeader();
+            ReadHttpMessage(message, stream);
+            
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.DebugFormat("Response Received. {0}", TraceUtils.GetHttpTrace(message.MessageHeader));
+            }
+        }
+
+        private void ReadHttpMessage(HttpMessage message, Stream stream)
+        {
+            Contract.Requires<ArgumentNullException>(message != null, "message");
+            Contract.Requires<ArgumentNullException>(stream != null, "stream");
+            Contract.Requires<ArgumentException>(stream.CanRead, "stream");
+
+            try
+            {
+                message.Read(stream);
+            }
+            catch (IOException ex)
+            {
+                if (!HandleSocketException(ex))
+                {
+                    throw;
+                }
+            }
         }
     }
 }

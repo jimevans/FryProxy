@@ -5,8 +5,10 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using FryProxy.Handlers;
 using FryProxy.Headers;
 using FryProxy.IO;
+using FryProxy.Messages;
 using FryProxy.Utils;
 using FryProxy.Writers;
 using log4net;
@@ -19,30 +21,9 @@ namespace FryProxy
     /// <summary>
     ///     Process incoming HTTP request and provides interface for intercepting it at different stages.
     /// </summary>
-    public class HttpProxy
+    public class HttpProxy : AbstractHttpProxy
     {
         protected const Int32 DefaultHttpPort = 80;
-
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof (HttpProxy));
-
-        private static readonly TimeSpan DefaultCommunicationTimeout = TimeSpan.FromSeconds(1);
-
-        private readonly Int32 _defaultPort;
-
-        private readonly ActionWrapper<ProcessingContext> _onProcessingCompleteWrapper =
-            new ActionWrapper<ProcessingContext>();
-
-        private readonly ActionWrapper<ProcessingContext> _onRequestReceivedWrapper =
-            new ActionWrapper<ProcessingContext>();
-
-        private readonly ActionWrapper<ProcessingContext> _onResponseReceivedWrapper =
-            new ActionWrapper<ProcessingContext>();
-
-        private readonly ActionWrapper<ProcessingContext> _onResponseSentWrapper =
-            new ActionWrapper<ProcessingContext>();
-
-        private readonly ActionWrapper<ProcessingContext> _onServerConnectedWrapper =
-            new ActionWrapper<ProcessingContext>();
 
         private readonly ProcessingPipeline _pipeline;
 
@@ -59,20 +40,8 @@ namespace FryProxy
         /// <param name="defaultPort">
         ///     Port number on destination server which will be used if not specified in request
         /// </param>
-        public HttpProxy(Int32 defaultPort)
+        public HttpProxy(Int32 defaultPort) : base(defaultPort)
         {
-            Contract.Requires<ArgumentOutOfRangeException>(
-                defaultPort > IPEndPoint.MinPort 
-                && defaultPort < IPEndPoint.MaxPort, "defaultPort"
-            );
-
-            _defaultPort = defaultPort;
-
-            ClientReadTimeout = DefaultCommunicationTimeout;
-            ClientWriteTimeout = DefaultCommunicationTimeout;
-            ServerReadTimeout = DefaultCommunicationTimeout;
-            ServerWriteTimeout = DefaultCommunicationTimeout;
-
             _pipeline = new ProcessingPipeline(new Dictionary<ProcessingStage, Action<ProcessingContext>>
             {
                 {ProcessingStage.ReceiveRequest, ReceiveRequest + _onRequestReceivedWrapper},
@@ -84,78 +53,6 @@ namespace FryProxy
         }
 
         /// <summary>
-        ///     Called when all other stages of request processing are done.
-        ///     All <see cref="ProcessingContext" /> information should be available now.
-        /// </summary>
-        public Action<ProcessingContext> OnProcessingComplete
-        {
-            get { return _onProcessingCompleteWrapper.Action; }
-            set { _onProcessingCompleteWrapper.Action = value; }
-        }
-
-        /// <summary>
-        ///     Called when request from client is received by proxy.
-        ///     <see cref="ProcessingContext.RequestHeader" /> and <see cref="ProcessingContext.ClientStream" /> are available at
-        ///     this stage.
-        /// </summary>
-        public Action<ProcessingContext> OnRequestReceived
-        {
-            get { return _onRequestReceivedWrapper.Action; }
-            set { _onRequestReceivedWrapper.Action = value; }
-        }
-
-        /// <summary>
-        ///     Called when response from destination server is received by proxy.
-        ///     <see cref="ProcessingContext.ResponseHeader" /> is added at this stage.
-        /// </summary>
-        public Action<ProcessingContext> OnResponseReceived
-        {
-            get { return _onResponseReceivedWrapper.Action; }
-            set { _onResponseReceivedWrapper.Action = value; }
-        }
-
-        /// <summary>
-        ///     Called when server response has been relayed to client.
-        ///     All <see cref="ProcessingContext" /> information should be available.
-        /// </summary>
-        public Action<ProcessingContext> OnResponseSent
-        {
-            get { return _onResponseSentWrapper.Action; }
-            set { _onResponseSentWrapper.Action = value; }
-        }
-
-        /// <summary>
-        ///     Called when proxy has established connection to destination server.
-        ///     <see cref="ProcessingContext.ServerEndPoint" /> and <see cref="ProcessingContext.ServerStream" /> are defined at
-        ///     this stage.
-        /// </summary>
-        public Action<ProcessingContext> OnServerConnected
-        {
-            get { return _onServerConnectedWrapper.Action; }
-            set { _onServerConnectedWrapper.Action = value; }
-        }
-
-        /// <summary>
-        ///     Client socket read timeout
-        /// </summary>
-        public TimeSpan ClientReadTimeout { get; set; }
-
-        /// <summary>
-        ///     Client socket write timeout
-        /// </summary>
-        public TimeSpan ClientWriteTimeout { get; set; }
-
-        /// <summary>
-        ///     Server socket read timeout
-        /// </summary>
-        public TimeSpan ServerReadTimeout { get; set; }
-
-        /// <summary>
-        ///     Server socket write timeout
-        /// </summary>
-        public TimeSpan ServerWriteTimeout { get; set; }
-
-        /// <summary>
         ///     Accept client connection, create <see cref="ProcessingContext" /> and <see cref="ProcessingContext.ClientStream" />
         ///     and start processing request.
         /// </summary>
@@ -164,6 +61,8 @@ namespace FryProxy
         {
             Contract.Requires<ArgumentNullException>(clientSocket != null, "clientSocket");
 
+            IHttpMessageReader reader = new DefaultHttpMessageReader();
+ 
             var context = new ProcessingContext
             {
                 ClientSocket = clientSocket,

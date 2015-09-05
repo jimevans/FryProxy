@@ -7,7 +7,7 @@ using log4net;
 
 namespace FryProxy.Handlers
 {
-    internal abstract class RequestHandlerSkeleton
+    internal abstract class HandlerSkeleton
     {
         private ILog _logger;
 

@@ -3,7 +3,7 @@ using FryProxy.Messages;
 
 namespace FryProxy.Handlers
 {
-    internal interface IHttpMessageWriter
+    public interface IHttpMessageWriter
     {
         void WriteHttpMessage(HttpMessage httpMessage, Stream outputStream);
     }

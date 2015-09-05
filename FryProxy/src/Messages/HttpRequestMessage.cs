@@ -5,17 +5,31 @@ namespace FryProxy.Messages
 {
     public class HttpRequestMessage : HttpMessage
     {
-        public HttpRequestMessage(HttpRequestHeader header) : base(header)
+        public HttpRequestMessage()
         {
         }
 
-        public HttpRequestMessage(HttpRequestHeader header, Stream body) : base(header, body)
+        public HttpRequestMessage(HttpRequestHeader messageHeader) : base(messageHeader)
+        {
+        }
+
+        public HttpRequestMessage(HttpRequestHeader messageHeader, Stream body) : base(messageHeader, body)
         {
         }
 
         public HttpRequestHeader RequestHeader
         {
-            get { return Header as HttpRequestHeader; }
+            get { return MessageHeader as HttpRequestHeader; }
+        }
+
+        public RequestMethodTypes RequestMethod
+        {
+            get { return RequestHeader.MethodType; }
+        }
+
+        protected override HttpMessageHeader ReadHeader(Stream stream)
+        {
+            return new HttpRequestHeader(base.ReadHeader(stream));
         }
     }
 }

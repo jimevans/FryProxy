@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
-using FryProxy.Headers;
+﻿using System.IO;
+using FryProxy.Messages;
 
 namespace FryProxy.Handlers
 {
-    internal interface IHttpMessageReader
+    public interface IHttpMessageReader
     {
-        Tuple<HttpRequestHeader, Stream> ReadHttpRequest(Stream stream);
+        void ReadHttpRequest(HttpRequestMessage message, Stream stream);
 
-        Tuple<HttpResponseHeader, Stream> ReadHttpResponse(Stream stream);
+        void ReadHttpResponse(HttpResponseMessage message, Stream stream);
+
     }
 }

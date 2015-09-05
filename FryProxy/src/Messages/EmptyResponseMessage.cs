@@ -3,9 +3,9 @@ using FryProxy.Headers;
 
 namespace FryProxy.Messages
 {
-    public class EmptyHttpResponseMessage : HttpResponseMessage
+    public class EmptyResponseMessage : HttpResponseMessage
     {
-        public EmptyHttpResponseMessage(Int32 statusCode, String statusMessage)
+        public EmptyResponseMessage(Int32 statusCode, String statusMessage)
             : base(new HttpResponseHeader(statusCode, statusMessage))
         {
         }

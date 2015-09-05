@@ -6,48 +6,104 @@ using FryProxy.IO;
 
 namespace FryProxy.Messages
 {
-    public abstract class HttpMessage : HttpMessageHeader
+    public abstract class HttpMessage : IHttpMessageHeader
     {
-        protected HttpMessage(HttpMessageHeader header)
-        {
-            Contract.Requires<ArgumentNullException>(header != null, "header");
+        private HttpMessageHeader _messageHeader;
 
-            Header = header;
+        protected HttpMessage()
+        {
         }
 
-        protected HttpMessage(HttpMessageHeader header, Stream body)
+        protected HttpMessage(HttpMessageHeader messageHeader)
         {
+            Contract.Requires<ArgumentNullException>(messageHeader != null, "messageHeader");
+
+            _messageHeader = messageHeader;
+        }
+
+        protected HttpMessage(HttpMessageHeader messageHeader, Stream body)
+        {
+            Contract.Requires<ArgumentNullException>(messageHeader != null, "messageHeader");
+
+            _messageHeader = messageHeader;
+
             Body = body;
-            Header = header;
         }
 
-        public HttpMessageHeader Header { get; private set; }
+        public HttpMessageHeader MessageHeader
+        {
+            get { return _messageHeader; }
+        }
 
         public Stream Body { get; set; }
 
-        public void WriteTo(Stream stream)
+        public bool Chunked
+        {
+            get { return _messageHeader.Chunked; }
+        }
+
+        public string StartLine
+        {
+            get { return _messageHeader.StartLine; }
+        }
+
+        public HttpHeaders Headers
+        {
+            get { return _messageHeader.Headers; }
+        }
+
+        public GeneralHeaders GeneralHeaders
+        {
+            get { return _messageHeader.GeneralHeaders; }
+        }
+
+        public EntityHeaders EntityHeaders
+        {
+            get { return _messageHeader.EntityHeaders; }
+        }
+
+        public void Read(Stream stream)
         {
             Contract.Requires<ArgumentNullException>(stream != null, "stream");
+            Contract.Requires<ArgumentException>(stream.CanRead, "stream");
+
+            _messageHeader = ReadHeader(stream);
+
+            Body = stream;
+        }
+
+        protected virtual HttpMessageHeader ReadHeader(Stream stream)
+        {
+            Contract.Requires<ArgumentNullException>(stream != null, "stream");
+            Contract.Requires<ArgumentException>(stream.CanRead, "stream");
+
+            return new HttpHeaderReader(new NonBufferedStreamReader(stream)).ReadHttpMessageHeader();
+        }
+
+        public void Write(Stream stream)
+        {
+            Contract.Requires<ArgumentNullException>(stream != null, "stream");
+            Contract.Requires<ArgumentException>(stream.CanWrite, "stream");
 
             var writer = new HttpContentWriter(stream);
 
-            writer.WriteHttpMessageHeader(Header.StartLine, Header.Headers.Lines);
+            writer.WriteHttpMessageHeader(MessageHeader.StartLine, MessageHeader.Headers.Lines);
 
             if (Body != null)
             {
-                WriteBody(writer);    
+                WriteBody(writer);
             }
         }
 
         protected virtual void WriteBody(HttpContentWriter writer)
         {
-            if (Header.Chunked)
+            if (MessageHeader.Chunked)
             {
                 writer.WriteChunckedHttpMessageBody(Body);
             }
-            else if (Header.EntityHeaders.ContentLength.HasValue)
+            else if (MessageHeader.EntityHeaders.ContentLength.HasValue)
             {
-                writer.WritePlainHttpMessageBody(Body, Header.EntityHeaders.ContentLength.Value);
+                writer.WritePlainHttpMessageBody(Body, MessageHeader.EntityHeaders.ContentLength.Value);
             }
         }
     }
