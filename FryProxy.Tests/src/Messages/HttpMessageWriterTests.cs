@@ -6,7 +6,7 @@ using FryProxy.Headers;
 using FryProxy.Messages;
 using NUnit.Framework;
 
-namespace FryProxy.Tests.Writers
+namespace FryProxy.Tests.Messages
 {
     public class HttpMessageWriterTests
     {

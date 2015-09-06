@@ -75,10 +75,10 @@ namespace FryProxy.IO
             {
                 WriteLine(size.ToString("X"));
                 WritePlainHttpMessageBody(contentStream, size);
-                WriteLineTerminator();
             }
 
             WriteLine("0");
+            WriteLineTerminator();
         }
     }
 }

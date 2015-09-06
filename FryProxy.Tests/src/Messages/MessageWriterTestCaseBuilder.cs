@@ -4,7 +4,7 @@ using System.Text;
 using FryProxy.Headers;
 using NUnit.Framework;
 
-namespace FryProxy.Tests.Writers
+namespace FryProxy.Tests.Messages
 {
     public class MessageWriterTestCaseBuilder
     {

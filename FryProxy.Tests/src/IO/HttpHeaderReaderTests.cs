@@ -5,7 +5,7 @@ using System.Text;
 using FryProxy.IO;
 using NUnit.Framework;
 
-namespace FryProxy.Tests.Readers
+namespace FryProxy.Tests.IO
 {
     public class HttpHeaderReaderTests : AssertionHelper
     {
