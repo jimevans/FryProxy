@@ -110,7 +110,6 @@
     <Compile Include="src\Integration\FirefoxIntegrationTests.cs" />
     <Compile Include="src\Integration\IntegrationTestFixture.cs" />
     <Compile Include="src\Integration\InterceptionTests.cs" />
-    <Compile Include="src\Integration\ProcessingPipelineTests.cs" />
     <Compile Include="src\Readers\HttpHeaderReaderTests.cs" />
     <Compile Include="src\Utils\SocketUtilsTests.cs" />
     <Compile Include="src\Writers\HttpMessageWriterTests.cs" />
@@ -127,7 +126,12 @@
       <Name>FryProxy</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="..\packages\WebDriver.ChromeDriver.win32.2.19.0.0\content\chromedriver.exe">
+      <Link>chromedriver.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

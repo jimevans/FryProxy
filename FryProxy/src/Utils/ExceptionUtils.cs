@@ -6,7 +6,7 @@ using System.Net.Sockets;
 
 namespace FryProxy.Utils
 {
-    static public class SocketUtils
+    static public class ExceptionUtils
     {
         public static Boolean IsSocketException(this Exception exception, params SocketError[] errorCodes) {
             Contract.Requires<ArgumentNullException>(exception != null);

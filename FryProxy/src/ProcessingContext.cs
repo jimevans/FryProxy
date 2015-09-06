@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -13,16 +12,6 @@ namespace FryProxy
     /// </summary>
     public class ProcessingContext
     {
-        /// <summary>
-        ///     Exception thrown during processing request
-        /// </summary>
-        public Exception Exception { get; internal set; }
-
-        /// <summary>
-        ///     Current stage of request processing process
-        /// </summary>
-        public ProcessingStage Stage { get; internal set; }
-
         /// <summary>
         ///     Destination server endpoint
         /// </summary>
@@ -59,22 +48,16 @@ namespace FryProxy
         public Socket ServerSocket { get; internal set; }
 
         /// <summary>
+        ///     Flag indicating that request was processed successfully or processing was interrupted.
+        /// </summary>
+        public Boolean Processed { get; private set; }
+
+        /// <summary>
         ///     Interrupt processing current request
         /// </summary>
         public void StopProcessing()
         {
-            Stage = ProcessingStage.Completed;
-        }
-
-        /// <summary>
-        ///     Flag indicating that request was processed successfully or processing was interrupted.
-        /// </summary>
-        public Boolean Processed
-        {
-            get
-            {
-                return Stage == ProcessingStage.Completed;
-            }
+            Processed = true;
         }
     }
 }

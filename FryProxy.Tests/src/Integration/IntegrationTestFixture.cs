@@ -31,7 +31,7 @@ namespace FryProxy.Tests.Integration {
         public void SetUpProxy() {
             var socketTimeout = TimeSpan.FromSeconds(5);
 
-            HttpProxyServer = new HttpProxyServer("localhost", new HttpProxy() {
+            HttpProxyServer = new HttpProxyServer("localhost", new HttpProxy {
                 ClientWriteTimeout = socketTimeout,
                 ServerWriteTimeout = socketTimeout,
                 ClientReadTimeout = socketTimeout,

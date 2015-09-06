@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
-using System.IO;
 using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
-using FryProxy.Headers;
-using FryProxy.Utils;
-using FryProxy.Writers;
+using FryProxy.Handlers;
 
 namespace FryProxy
 {
@@ -19,12 +14,12 @@ namespace FryProxy
     {
         private const Int32 DefaultSecureHttpPort = 443;
 
-        private static readonly RemoteCertificateValidationCallback DefaultCertificateValidationCallback =
+        private static readonly RemoteCertificateValidationCallback DefaultValidationCallback =
             (sender, certificate, chain, errors) => true;
 
-        private readonly X509Certificate _certificate;
-
         private readonly RemoteCertificateValidationCallback _certificateValidationCallback;
+
+        private readonly IHttpMessageReader _httpMessageReader;
 
         /// <summary>
         ///     Creates new instance of <see cref="HttpProxy" /> using provided default port and internal buffer size.
@@ -43,9 +38,9 @@ namespace FryProxy
         {
             Contract.Requires<ArgumentNullException>(certificate != null, "certificate");
 
-            _certificateValidationCallback = rcValidationCallback ?? DefaultCertificateValidationCallback;
+            _certificateValidationCallback = rcValidationCallback ?? DefaultValidationCallback;
 
-            _certificate = certificate;
+            _httpMessageReader = new SslHttpMessageReader(certificate, _certificateValidationCallback);
         }
 
         /// <summary>
@@ -63,100 +58,21 @@ namespace FryProxy
         {
         }
 
-        /// <summary>
-        ///     Establish secured connection to destination server.
-        /// </summary>
-        /// <param name="context">current request context</param>
-        protected override void ConnectToServer(ProcessingContext context)
+        protected override IHttpMessageReader HttpMessageReader
         {
-            base.ConnectToServer(context);
-
-            if (context.Processed)
-            {
-                return;
-            }
-
-            if (context.ServerStream == null)
-            {
-                throw new InvalidContextException("ServerStream");
-            }
-
-            if (context.ServerEndPoint == null)
-            {
-                throw new InvalidContextException("ServerEndPoint");
-            }
-
-            var sslServerStream = new SslStream(context.ServerStream, false, _certificateValidationCallback);
-            sslServerStream.AuthenticateAsClient(context.ServerEndPoint.Host);
-            context.ServerStream = sslServerStream;
-
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("SSL Connection Established: {0}:{1}",
-                    context.ServerEndPoint.Host,
-                    context.ServerEndPoint.Port
-                );
-            }
+            get { return _httpMessageReader; }
         }
 
-        /// <summary>
-        ///     Establish secured connection with client and receive HTTP request using it.
-        /// </summary>
-        /// <param name="context">current request context</param>
-        protected override void ReceiveRequest(ProcessingContext context)
+        protected override IRemoteEndpointConnector RemoteEndpointConnector
         {
-            base.ReceiveRequest(context);
-
-            if (context.Processed)
+            get
             {
-                return;
+                return new SslEndpointConnector(
+                    DefaultPort, 
+                    ServerWriteTimeout, 
+                    ServerReadTimeout,
+                    _certificateValidationCallback);
             }
-
-            if (context.RequestHeader == null)
-            {
-                throw new InvalidContextException("RequestHeader");
-            }
-
-            if (context.RequestHeader.MethodType != RequestMethodTypes.CONNECT)
-            {
-                throw new InvalidOperationException("Not SSL request");
-            }
-
-            if (context.ClientStream == null)
-            {
-                throw new InvalidContextException("ClientStream");
-            }
-
-            var responseWriter = new HttpResponseWriter(context.ClientStream);
-
-            var sslStream = new SslStream(context.ClientStream, false, _certificateValidationCallback);
-
-            try
-            {
-                responseWriter.WriteConnectionEstablished();
-                sslStream.AuthenticateAsServer(_certificate, false, SslProtocols.Tls, false);
-                context.ClientStream = sslStream;
-
-                base.ReceiveRequest(context);
-            }
-            catch (IOException ex)
-            {
-                if (ex.IsSocketException(SocketError.ConnectionReset, SocketError.ConnectionAborted))
-                {
-                    Logger.WarnFormat("Request Aborted. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
-                }
-                else if(ex.IsSocketException(SocketError.TimedOut))
-                {
-                    Logger.WarnFormat("Client request time out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
-                }
-                else
-                {
-                    throw;
-                }
-
-                context.StopProcessing();
-            }
-            
         }
     }
 }

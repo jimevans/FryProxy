@@ -19,7 +19,7 @@ namespace FryProxy {
         /// </summary>
         /// <param name="hostname">hostname to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
-        public HttpProxyServer(String hostname, HttpProxy httpProxy) : this(hostname, 0, httpProxy) {}
+        public HttpProxyServer(String hostname, AbstractHttpProxy httpProxy) : this(hostname, 0, httpProxy) {}
 
         /// <summary>
         ///     Create server bound to given hostname and port
@@ -27,7 +27,7 @@ namespace FryProxy {
         /// <param name="hostname">hostname to bind</param>
         /// <param name="port">port to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
-        public HttpProxyServer(String hostname, Int32 port, HttpProxy httpProxy)
+        public HttpProxyServer(String hostname, Int32 port, AbstractHttpProxy httpProxy)
             : this(new DnsEndPoint(hostname, port, AddressFamily.InterNetwork), httpProxy) {}
 
         /// <summary>
@@ -35,14 +35,15 @@ namespace FryProxy {
         /// </summary>
         /// <param name="proxyEndPoint">local endpoint to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
-        public HttpProxyServer(DnsEndPoint proxyEndPoint, HttpProxy httpProxy) : this(ToIPEndPoint(proxyEndPoint), httpProxy) {}
+        public HttpProxyServer(DnsEndPoint proxyEndPoint, AbstractHttpProxy httpProxy) : this(ToIPEndPoint(proxyEndPoint), httpProxy) { }
 
         /// <summary>
         ///     Create server bound to given local endpoint
         /// </summary>
         /// <param name="proxyEndPoint">local endpoint to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
-        public HttpProxyServer(IPEndPoint proxyEndPoint, HttpProxy httpProxy) {
+        public HttpProxyServer(IPEndPoint proxyEndPoint, AbstractHttpProxy httpProxy)
+        {
             Contract.Requires<ArgumentNullException>(proxyEndPoint != null, "proxyEndPoint");
             Contract.Requires<ArgumentNullException>(httpProxy != null, "httpProxy");
 
@@ -59,7 +60,7 @@ namespace FryProxy {
         /// <summary>
         ///     Proxy which handles incoming request
         /// </summary>
-        public HttpProxy Proxy {
+        public AbstractHttpProxy Proxy {
             get { return _worker.Proxy; }
         }
 

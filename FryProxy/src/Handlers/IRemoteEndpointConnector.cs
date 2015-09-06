@@ -5,7 +5,7 @@ using FryProxy.Headers;
 
 namespace FryProxy.Handlers
 {
-    public interface IRemoteSocketConnector
+    public interface IRemoteEndpointConnector
     {
         Tuple<Socket, Stream> EstablishConnection(HttpRequestHeader requestHeader);
     }

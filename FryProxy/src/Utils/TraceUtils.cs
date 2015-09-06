@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FryProxy.Headers;
@@ -8,7 +7,7 @@ namespace FryProxy.Utils
 {
     public static class TraceUtils
     {
-        public static void WriteHttpTrace(this StringBuilder stringBuilder, HttpMessageHeader messageHeader)
+        public static void WriteHttpTraceMessage(this StringBuilder stringBuilder, HttpMessageHeader messageHeader)
         {
             if (messageHeader == null)
             {
@@ -36,7 +35,7 @@ namespace FryProxy.Utils
             }
         }
 
-        public static String GetHttpTrace(HttpMessageHeader header)
+        public static String GetHttpTraceMessage(HttpMessageHeader header)
         {
             if (header == null)
             {
@@ -45,10 +44,9 @@ namespace FryProxy.Utils
 
             var sb = new StringBuilder();
 
-            WriteHttpTrace(sb, header);
+            WriteHttpTraceMessage(sb, header);
 
             return sb.ToString();
         }
-
     }
 }

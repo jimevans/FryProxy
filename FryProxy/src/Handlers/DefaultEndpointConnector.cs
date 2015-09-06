@@ -8,7 +8,7 @@ using HttpRequestHeader = FryProxy.Headers.HttpRequestHeader;
 
 namespace FryProxy.Handlers
 {
-    internal class DefaultSocketConnector : HandlerSkeleton, IRemoteSocketConnector
+    internal class DefaultEndpointConnector : HandlerSkeleton, IRemoteEndpointConnector
     {
         private static readonly Regex HostAndPortRegex = new Regex(@"(?<host>\w+):(?<port>\d+)");
 
@@ -17,7 +17,7 @@ namespace FryProxy.Handlers
         private readonly TimeSpan _socketReadTimeout;
         private readonly TimeSpan _socketWriteTimeout;
 
-        public DefaultSocketConnector(Int32 defaultPort, TimeSpan socketWriteTimeout, TimeSpan socketReadTimeout)
+        public DefaultEndpointConnector(Int32 defaultPort, TimeSpan socketWriteTimeout, TimeSpan socketReadTimeout)
         {
             Contract.Requires<ArgumentOutOfRangeException>(defaultPort > IPEndPoint.MinPort&& defaultPort < IPEndPoint.MaxPort, "defaultPort");
             Contract.Requires<ArgumentNullException>(socketWriteTimeout != null, "socketWriteTimeout");

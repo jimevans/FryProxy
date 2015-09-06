@@ -15,7 +15,7 @@ namespace FryProxy.Handlers
 
             if (Logger.IsDebugEnabled)
             {
-                Logger.DebugFormat("Request Received. {0}", TraceUtils.GetHttpTrace(message.MessageHeader));
+                Logger.DebugFormat("Request Received. {0}", TraceUtils.GetHttpTraceMessage(message.MessageHeader));
             }
 
             if (message.Headers.Contains(GeneralHeaders.ProxyConnectionHeader))
@@ -32,7 +32,7 @@ namespace FryProxy.Handlers
             
             if (Logger.IsDebugEnabled)
             {
-                Logger.DebugFormat("Response Received. {0}", TraceUtils.GetHttpTrace(message.MessageHeader));
+                Logger.DebugFormat("Response Received. {0}", TraceUtils.GetHttpTraceMessage(message.MessageHeader));
             }
         }
 

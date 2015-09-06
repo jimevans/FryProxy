@@ -45,13 +45,13 @@ namespace FryProxy
             if (requestHeader != null)
             {
                 messageBuilder.AppendLine("Request:");
-                messageBuilder.WriteHttpTrace(requestHeader);
+                messageBuilder.WriteHttpTraceMessage(requestHeader);
             }
 
             if (responseHeader != null)
             {
                 messageBuilder.AppendLine("Response:");
-                messageBuilder.WriteHttpTrace(responseHeader);
+                messageBuilder.WriteHttpTraceMessage(responseHeader);
             }
 
             return messageBuilder.ToString();

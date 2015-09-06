@@ -10,7 +10,7 @@ namespace FryProxy
 {
     internal class HttpProxyWorker
     {
-        private readonly HttpProxy _httpProxy;
+        private readonly AbstractHttpProxy _httpProxy;
         private readonly TcpListener _listener;
 
         private readonly ILog _logger = LogManager.GetLogger(typeof (HttpProxyWorker));
@@ -18,12 +18,12 @@ namespace FryProxy
         private Thread _acceptSocketThread;
         private Boolean _shuttingDown;
 
-        public HttpProxyWorker(IPEndPoint proxyEndPoint, HttpProxy httpProxy)
+        public HttpProxyWorker(IPEndPoint proxyEndPoint, AbstractHttpProxy httpProxy)
             : this(new TcpListener(proxyEndPoint), httpProxy)
         {
         }
 
-        private HttpProxyWorker(TcpListener listener, HttpProxy httpProxy)
+        private HttpProxyWorker(TcpListener listener, AbstractHttpProxy httpProxy)
         {
             _openSockets = new HashSet<Socket>();
             _httpProxy = httpProxy;
@@ -35,7 +35,7 @@ namespace FryProxy
             get { return _listener.LocalEndpoint as IPEndPoint; }
         }
 
-        public HttpProxy Proxy
+        public AbstractHttpProxy Proxy
         {
             get { return _httpProxy; }
         }
@@ -142,7 +142,7 @@ namespace FryProxy
 
             try
             {
-                _httpProxy.HandleClient(socket);
+                _httpProxy.AcceptSocket(socket);
             }
             catch (Exception ex)
             {

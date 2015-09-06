@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using FryProxy.Headers;
-using FryProxy.Writers;
+using FryProxy.Messages;
 using NUnit.Framework;
 using OpenQA.Selenium;
 
@@ -29,7 +29,7 @@ namespace FryProxy.Tests.Integration
         {
             HttpProxyServer.Proxy.OnRequestReceived = context =>
             {
-                HttpRequestHeader header = context.RequestHeader;
+                var header = context.RequestHeader;
 
                 if (!header.Host.Contains("wikipedia.org"))
                 {
@@ -48,7 +48,7 @@ namespace FryProxy.Tests.Integration
         [Test]
         public void ShouldReplaceResponse()
         {
-            string responseBody = new StringBuilder()
+            var responseBody = new StringBuilder()
                 .AppendLine("<html>")
                 .AppendLine("<head><title>Fry Rocks!</title></head>")
                 .AppendLine("<body><h1>Fry Proxy</h1></body>")
@@ -71,11 +71,7 @@ namespace FryProxy.Tests.Integration
                 responseHeader.EntityHeaders.ContentEncoding = "us-ascii";
                 responseHeader.EntityHeaders.ContentLength = responseStream.Length;
 
-                new HttpResponseWriter(context.ClientStream).Write(
-                    responseHeader, 
-                    responseStream, 
-                    responseStream.Length
-                );
+                new HttpResponseMessage(responseHeader, responseStream).Write(context.ClientStream);
             };
 
             WebDriver.Navigate().GoToUrl("http://www.wikipedia.org");

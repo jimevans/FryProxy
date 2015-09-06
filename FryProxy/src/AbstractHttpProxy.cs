@@ -14,6 +14,7 @@ namespace FryProxy
     public abstract class AbstractHttpProxy
     {
         protected readonly ILog Logger;
+
         private readonly Int32 _defaultPort;
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace FryProxy
 
         protected abstract IHttpMessageWriter HttpMessageWriter { get; }
 
-        protected abstract IRemoteSocketConnector RemoteSocketConnector { get; }
+        protected abstract IRemoteEndpointConnector RemoteEndpointConnector { get; }
 
         public void AcceptSocket(Socket socket)
         {
@@ -113,9 +114,12 @@ namespace FryProxy
             var requestMessage = new HttpRequestMessage();
             var responseMessage = new HttpResponseMessage();
 
+            Socket serverSocket = null;
+            Stream serverStream = null, clientStream = null;
+
             try
             {
-                ctx.ClientStream = new NetworkStream(socket, true)
+                ctx.ClientStream = clientStream = new NetworkStream(socket, true)
                 {
                     ReadTimeout = (Int32) ClientReadTimeout.TotalMilliseconds,
                     WriteTimeout = (Int32) ClientWriteTimeout.TotalMilliseconds
@@ -129,10 +133,9 @@ namespace FryProxy
                     return;
                 }
 
-                Tuple<Socket, Stream> socketAndStream =
-                    RemoteSocketConnector.EstablishConnection(requestMessage.RequestHeader);
-                ctx.ServerSocket = socketAndStream.Item1;
-                ctx.ServerStream = socketAndStream.Item2;
+                var serverSocketAndStream = RemoteEndpointConnector.EstablishConnection(requestMessage.RequestHeader);
+                ctx.ServerSocket = serverSocket = serverSocketAndStream.Item1;
+                ctx.ServerStream = serverStream = serverSocketAndStream.Item2;
 
                 if (InvokeHanlder(ctx, OnServerConnected))
                 {
@@ -158,32 +161,58 @@ namespace FryProxy
             }
             catch (Exception ex)
             {
-                var errorMessage = new StringBuilder("Request processing failed.");
-
-                errorMessage.AppendLine();
-
-                if (ctx.RequestHeader != null)
-                {
-                    errorMessage.AppendLine("Request:");
-                    errorMessage.WriteHttpTrace(ctx.RequestHeader);
-                }
-
-                if (ctx.ResponseHeader != null)
-                {
-                    errorMessage.AppendLine("Response:");
-                    errorMessage.WriteHttpTrace(ctx.ResponseHeader);
-                }
-
-                errorMessage.AppendLine("Exception:");
-                errorMessage.AppendLine(ex.ToString());
-
-                Logger.Error(errorMessage.ToString());
+                LogException(ex, ctx);
             }
             finally
             {
                 ctx.StopProcessing();
-                InvokeHanlder(ctx, OnProcessingComplete);
+
+                try
+                {
+                    foreach (var stream in new[] {clientStream, serverStream, ctx.ClientStream, ctx.ServerStream})
+                    {
+                        if (stream != null)
+                        {
+                            stream.Close();
+                        }
+                    }
+
+                    if (serverSocket != null)
+                    {
+                        serverSocket.Close();
+                    }
+
+                    InvokeHanlder(ctx, OnProcessingComplete);
+                }
+                catch (Exception ex)
+                {
+                    LogException(ex, ctx);
+                }
             }
+        }
+
+        private void LogException(Exception ex, ProcessingContext ctx)
+        {
+            var errorMessage = new StringBuilder("Request processing failed.");
+
+            errorMessage.AppendLine();
+
+            if (ctx.RequestHeader != null)
+            {
+                errorMessage.AppendLine("Request:");
+                errorMessage.WriteHttpTraceMessage(ctx.RequestHeader);
+            }
+
+            if (ctx.ResponseHeader != null)
+            {
+                errorMessage.AppendLine("Response:");
+                errorMessage.WriteHttpTraceMessage(ctx.ResponseHeader);
+            }
+
+            errorMessage.AppendLine("Exception:");
+            errorMessage.AppendLine(ex.ToString());
+
+            Logger.Error(errorMessage.ToString());
         }
 
         private static Boolean InvokeHanlder(ProcessingContext context, Action<ProcessingContext> handler)

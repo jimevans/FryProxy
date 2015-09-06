@@ -6,11 +6,11 @@ using System.Net.Sockets;
 
 namespace FryProxy.Handlers
 {
-    internal class SslSocketConnector : DefaultSocketConnector
+    internal class SslEndpointConnector : DefaultEndpointConnector
     {
         private readonly RemoteCertificateValidationCallback _certificateValidationCallback;
 
-        public SslSocketConnector(Int32 defaultPort, TimeSpan socketWriteTimeout, TimeSpan socketReadTimeout, RemoteCertificateValidationCallback certificateValidationCallback) : base(defaultPort, socketWriteTimeout, socketReadTimeout)
+        public SslEndpointConnector(Int32 defaultPort, TimeSpan socketWriteTimeout, TimeSpan socketReadTimeout, RemoteCertificateValidationCallback certificateValidationCallback) : base(defaultPort, socketWriteTimeout, socketReadTimeout)
         {
             _certificateValidationCallback = certificateValidationCallback;
         }

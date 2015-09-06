@@ -154,21 +154,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\AbstractHttpProxy.cs" />
+    <Compile Include="src\HttpProxy.cs" />
     <Compile Include="src\Handlers\DefaultHttpMessageWriter.cs" />
-    <Compile Include="src\Handlers\DefaultSocketConnector.cs" />
+    <Compile Include="src\Handlers\DefaultEndpointConnector.cs" />
     <Compile Include="src\Handlers\DefaultHttpMessageReader.cs" />
     <Compile Include="src\Handlers\IHttpMessageWriter.cs" />
     <Compile Include="src\Handlers\IHttpMessageReader.cs" />
-    <Compile Include="src\Handlers\IRemoteSocketConnector.cs" />
+    <Compile Include="src\Handlers\IRemoteEndpointConnector.cs" />
     <Compile Include="src\Handlers\HandlerSkeleton.cs" />
     <Compile Include="src\Handlers\SslHttpMessageReader.cs" />
-    <Compile Include="src\Handlers\SslSocketConnector.cs" />
+    <Compile Include="src\Handlers\SslEndpointConnector.cs" />
     <Compile Include="src\Headers\IHttpMessageHeader.cs" />
     <Compile Include="src\Headers\RequestMethodTypes.cs" />
-    <Compile Include="src\HttpProxy.cs" />
     <Compile Include="src\Headers\EntityHeaders.cs" />
     <Compile Include="src\HttpProxyWorker.cs" />
-    <Compile Include="src\InvalidContextException.cs" />
     <Compile Include="src\IO\HttpContentWriter.cs" />
     <Compile Include="src\IO\HttpHeaderReader.cs" />
     <Compile Include="src\IO\NonBufferedStreamReader.cs" />
@@ -180,8 +179,6 @@
     <Compile Include="src\Messages\HttpResponseMessage.cs" />
     <Compile Include="src\Messages\RequestTimeoutMessage.cs" />
     <Compile Include="src\ProcessingContext.cs" />
-    <Compile Include="src\ProcessingPipeline.cs" />
-    <Compile Include="src\ProcessingStage.cs" />
     <Compile Include="src\Headers\GeneralHeaders.cs" />
     <Compile Include="src\Headers\HttpHeaders.cs" />
     <Compile Include="src\Headers\HttpMessageHeader.cs" />
@@ -190,17 +187,13 @@
     <Compile Include="src\RequestAbortedException.cs" />
     <Compile Include="src\SslProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Utils\DnsUtils.cs" />
     <Compile Include="src\Utils\TraceUtils.cs" />
-    <Compile Include="src\Utils\SocketUtils.cs" />
-    <Compile Include="src\Writers\HttpContentWriter.cs" />
+    <Compile Include="src\Utils\ExceptionUtils.cs" />
     <Compile Include="src\HttpProxyServer.cs" />
-    <Compile Include="src\Writers\HttpResponseWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
