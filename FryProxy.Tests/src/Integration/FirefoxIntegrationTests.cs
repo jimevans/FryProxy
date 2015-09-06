@@ -2,7 +2,7 @@
 
 namespace FryProxy.Tests.Integration {
 
-    public class FirefoxIntegrationTests : AbstractIntegrationTests {
+    public class FirefoxIntegrationTests : CommonIntegrationTests {
 
         protected override IWebDriver CreateDriver(Proxy proxy) {
             return CreateFirefoxDriver(proxy);

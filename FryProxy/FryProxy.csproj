@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\AbstractHttpProxy.cs" />
+    <Compile Include="src\Handlers\RetryingMessageReader.cs" />
     <Compile Include="src\HttpProxy.cs" />
     <Compile Include="src\Handlers\DefaultHttpMessageWriter.cs" />
     <Compile Include="src\Handlers\DefaultEndpointConnector.cs" />
@@ -165,7 +166,7 @@
     <Compile Include="src\Handlers\SslHttpMessageReader.cs" />
     <Compile Include="src\Handlers\SslEndpointConnector.cs" />
     <Compile Include="src\Headers\IHttpMessageHeader.cs" />
-    <Compile Include="src\Headers\RequestMethodTypes.cs" />
+    <Compile Include="src\Headers\RequestMethods.cs" />
     <Compile Include="src\Headers\EntityHeaders.cs" />
     <Compile Include="src\HttpProxyWorker.cs" />
     <Compile Include="src\IO\HttpContentWriter.cs" />

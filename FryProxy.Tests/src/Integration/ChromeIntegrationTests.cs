@@ -2,7 +2,7 @@
 
 namespace FryProxy.Tests.Integration {
 
-    public class ChromeIntegratonTests : AbstractIntegrationTests {
+    public class ChromeIntegratonTests : CommonIntegrationTests {
 
         protected override IWebDriver CreateDriver(Proxy proxy) {
             return CreateChromeDriver(proxy);

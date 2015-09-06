@@ -26,7 +26,7 @@ namespace FryProxy.Handlers
         {
             base.ReadHttpRequest(message, stream);
 
-            if (message.RequestMethod != RequestMethodTypes.CONNECT)
+            if (message.RequestMethod != RequestMethods.CONNECT)
             {
                 return;
             }

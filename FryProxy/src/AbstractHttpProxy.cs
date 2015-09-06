@@ -11,6 +11,10 @@ using log4net;
 
 namespace FryProxy
 {
+    /// <summary>
+    ///     Basic HTTP proxy. Implements request processing flow 
+    ///     and delegates interaction with network protocols to descendants.
+    /// </summary>
     public abstract class AbstractHttpProxy
     {
         protected readonly ILog Logger;
@@ -20,7 +24,9 @@ namespace FryProxy
         /// <summary>
         ///     Create new instance of HTTP proxy. All timeouts will be initialized with default values.
         /// </summary>
-        /// <param name="defaultPort">Port number on destination server which will be used if not specified in request</param>
+        /// <param name="defaultPort">
+        ///     Port number on destination server which will be used if not specified in request
+        /// </param>
         protected AbstractHttpProxy(int defaultPort)
         {
             Contract.Requires<ArgumentOutOfRangeException>(
@@ -98,13 +104,28 @@ namespace FryProxy
             get { return _defaultPort; }
         }
 
+        /// <summary>
+        ///     Object used for reading request and response HTTP messages
+        /// </summary>
         protected abstract IHttpMessageReader HttpMessageReader { get; }
 
+        /// <summary>
+        ///     Object used for writing request and reponse HTTP messages
+        /// </summary>
         protected abstract IHttpMessageWriter HttpMessageWriter { get; }
 
+        /// <summary>
+        ///     Object used for opening sockets to remote servers and wrapping opened socket in stream
+        /// </summary>
         protected abstract IRemoteEndpointConnector RemoteEndpointConnector { get; }
 
-        public void AcceptSocket(Socket socket)
+        /// <summary>
+        ///     Handle request by reading client request, connecting to original destination endpoint,
+        ///     relay message to it and relay response back to client. Also trigger custom request 
+        ///     handlers on appropriate processing stages.
+        /// </summary>
+        /// <param name="socket">socket opened by proxy client</param>
+        public void AcceptClientSocket(Socket socket)
         {
             var ctx = new ProcessingContext
             {

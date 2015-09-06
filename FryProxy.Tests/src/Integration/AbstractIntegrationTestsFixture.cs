@@ -11,13 +11,13 @@ using OpenQA.Selenium.Remote;
 
 namespace FryProxy.Tests.Integration {
 
-    public abstract class IntegrationTestFixture {
+    public abstract class AbstractIntegrationTestsFixture {
 
         private const String CertificateName = "fry.pfx";
 
         private const String CertificatePass = "fry";
 
-        static IntegrationTestFixture() {
+        static AbstractIntegrationTestsFixture() {
             BasicConfigurator.Configure();
         }
 

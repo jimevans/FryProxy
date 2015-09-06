@@ -51,13 +51,13 @@ namespace FryProxy.Headers {
             StartLine = base.StartLine;
         }
 
-        public RequestMethodTypes MethodType {
+        public RequestMethods MethodType {
             get {
-                RequestMethodTypes methodType;
+                RequestMethods methodType;
 
                 var rawHttpMethod = Method;
 
-                if (RequestMethodTypes.TryParse(Method, false, out methodType)) {
+                if (RequestMethods.TryParse(Method, false, out methodType)) {
                     return methodType;
                 }
 
@@ -65,7 +65,7 @@ namespace FryProxy.Headers {
             }
 
             set {
-                Method = Enum.GetName(typeof(RequestMethodTypes), value);
+                Method = Enum.GetName(typeof(RequestMethods), value);
             }
         }
 

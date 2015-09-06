@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 
 namespace FryProxy.Tests.Integration
 {
-    public class InterceptionTests : IntegrationTestFixture
+    public class InterceptionTests : AbstractIntegrationTestsFixture
     {
         protected override IWebDriver CreateDriver(Proxy proxy)
         {

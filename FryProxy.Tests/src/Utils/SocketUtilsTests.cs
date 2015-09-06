@@ -38,7 +38,7 @@ namespace FryProxy.Tests.Utils
         [TestCaseSource("IsSocketExceptionTestCases")]
         public Boolean ShouldReturnWhetherExceptionIsSocketError(Exception exception, SocketError[] errors)
         {
-            return ExceptionUtils.IsSocketException(exception, errors);
+            return exception.IsSocketException(errors);
         }
     }
 }

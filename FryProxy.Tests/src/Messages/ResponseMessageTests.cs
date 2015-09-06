@@ -8,43 +8,39 @@ using NUnit.Framework;
 
 namespace FryProxy.Tests.Messages
 {
-    public class HttpMessageWriterTests
+    public class ResponseMessageTests
     {
         private static IEnumerable<ITestCaseData> WriteMessageTestCases
         {
             get
             {
-                yield return new MessageWriterTestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
-                    .SetContentEncodingHeader()
-                    .SetContentLengthHeader()
-                    .SetBodyLengthArgument()
-                    .TestCaseData;
-
-                yield return new MessageWriterTestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
+                yield return new TestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
                     .SetContentEncodingHeader()
                     .SetContentLengthHeader()
                     .TestCaseData;
 
-                yield return new MessageWriterTestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
+                yield return new TestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
                     .SetContentEncodingHeader()
                     .SetContentLengthHeader()
-                    .SetBodyLengthArgument(25L)
                     .TestCaseData;
 
-                yield return new MessageWriterTestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
+                yield return new TestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
                     .SetContentEncodingHeader()
                     .SetContentLengthHeader()
-                    .SetBodyLengthArgument(0)
                     .TestCaseData;
 
-                yield return new MessageWriterTestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
+                yield return new TestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
+                    .SetContentEncodingHeader()
+                    .SetContentLengthHeader()
+                    .TestCaseData;
+
+                yield return new TestCaseBuilder(new HttpResponseHeader(200, "OK", "1.1"), "ABCD")
                     .SetContentEncodingHeader()
                     .SetContentLengthHeader(0)
-                    .SetBodyLengthArgument(4)
                     .OverrideExpectedMessageBody(String.Empty)
                     .TestCaseData;
 
-                yield return new MessageWriterTestCaseBuilder(
+                yield return new TestCaseBuilder(
                     new HttpResponseHeader(200, "OK", "1.1"),
                     new StringBuilder()
                         .AppendLine("0")
@@ -54,7 +50,7 @@ namespace FryProxy.Tests.Messages
                     .SetChunkedTransferEncoding()
                     .TestCaseData;
 
-                yield return new MessageWriterTestCaseBuilder(
+                yield return new TestCaseBuilder(
                     new HttpResponseHeader(200, "OK", "1.1"),
                     new StringBuilder()
                         .AppendLine("4")
@@ -68,7 +64,7 @@ namespace FryProxy.Tests.Messages
                     .SetChunkedTransferEncoding()
                     .TestCaseData;
 
-                yield return new MessageWriterTestCaseBuilder(
+                yield return new TestCaseBuilder(
                     new HttpResponseHeader(200, "OK", "1.1"),
                     new StringBuilder()
                         .AppendLine("270F")
@@ -86,13 +82,91 @@ namespace FryProxy.Tests.Messages
         }
 
         [TestCaseSource("WriteMessageTestCases")]
-        public String ShouldWriteHttpMessage(HttpResponseHeader header, Stream body, long? bodyLength)
+        public String ShouldWriteHttpMessage(HttpResponseHeader header, Stream body)
         {
             var outputStream = new MemoryStream();
 
             new HttpResponseMessage(header, body).Write(outputStream);
 
             return Encoding.ASCII.GetString(outputStream.ToArray());
+        }
+
+        private class TestCaseBuilder
+        {
+            private readonly HttpMessageHeader _httpMessageHeader;
+            private readonly String _messageBody;
+            private String _expectedMessageBody;
+
+            public TestCaseBuilder(HttpMessageHeader header, String body)
+            {
+                _messageBody = body;
+                _httpMessageHeader = header;
+            }
+
+            private String ExpectedResult
+            {
+                get
+                {
+                    var expectedResult = new StringBuilder().AppendLine(_httpMessageHeader.StartLine);
+
+                    foreach (var headerLine in _httpMessageHeader.Headers.Lines)
+                    {
+                        expectedResult.AppendLine(headerLine);
+                    }
+
+                    expectedResult.AppendLine();
+
+                    if (_httpMessageHeader.GeneralHeaders.TransferEncoding == "chunked")
+                    {
+                        expectedResult.Append(_expectedMessageBody ?? _messageBody);
+                    }
+                    else
+                    {
+                        expectedResult.AppendLine(_expectedMessageBody ?? _messageBody);
+                    }
+
+                    return expectedResult.ToString();
+                }
+            }
+
+            public ITestCaseData TestCaseData
+            {
+                get
+                {
+                    return
+                        new TestCaseData(_httpMessageHeader, new MemoryStream(Encoding.ASCII.GetBytes(_messageBody)))
+                            .Returns(ExpectedResult);
+                }
+            }
+
+            public TestCaseBuilder SetContentEncodingHeader()
+            {
+                _httpMessageHeader.EntityHeaders.ContentEncoding = "us-ascii";
+
+                return this;
+            }
+
+            public TestCaseBuilder SetContentLengthHeader(int? contentLengthHeader = null)
+            {
+                _httpMessageHeader.EntityHeaders.ContentLength =
+                    contentLengthHeader.GetValueOrDefault(_messageBody.Length);
+
+                return this;
+            }
+
+            public TestCaseBuilder OverrideExpectedMessageBody(String messageBody)
+            {
+                _expectedMessageBody = messageBody;
+
+                return this;
+            }
+
+            public TestCaseBuilder SetChunkedTransferEncoding()
+            {
+                _httpMessageHeader.GeneralHeaders.TransferEncoding = "chunked";
+
+                return this;
+            }
         }
     }
 }

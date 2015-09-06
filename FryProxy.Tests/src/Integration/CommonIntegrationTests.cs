@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace FryProxy.Tests.Integration {
 
-    public abstract class AbstractIntegrationTests : IntegrationTestFixture {
+    public abstract class CommonIntegrationTests : AbstractIntegrationTestsFixture {
 
         [TestCase("http://www.example.com/", "Example Domain")]
         [TestCase("https://www.wikipedia.org", "Wikipedia")]

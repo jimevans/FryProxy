@@ -22,7 +22,7 @@ namespace FryProxy.Messages
             get { return MessageHeader as HttpRequestHeader; }
         }
 
-        public RequestMethodTypes RequestMethod
+        public RequestMethods RequestMethod
         {
             get { return RequestHeader.MethodType; }
         }

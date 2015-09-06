@@ -1,6 +1,6 @@
 ﻿namespace FryProxy.Headers {
 
-    public enum RequestMethodTypes {
+    public enum RequestMethods {
 
         GET,
         HEAD,

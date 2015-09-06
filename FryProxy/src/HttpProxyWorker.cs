@@ -142,7 +142,7 @@ namespace FryProxy
 
             try
             {
-                _httpProxy.AcceptSocket(socket);
+                _httpProxy.AcceptClientSocket(socket);
             }
             catch (Exception ex)
             {
