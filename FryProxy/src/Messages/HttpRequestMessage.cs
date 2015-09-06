@@ -13,7 +13,7 @@ namespace FryProxy.Messages
         {
         }
 
-        public HttpRequestMessage(HttpRequestHeader messageHeader, Stream body) : base(messageHeader, body)
+        public HttpRequestMessage(HttpRequestHeader messageHeader, Stream contentStream) : base(messageHeader, contentStream)
         {
         }
 

@@ -127,6 +127,7 @@ namespace FryProxy
 
                 HttpMessageReader.ReadHttpRequest(requestMessage, ctx.ClientStream);
                 ctx.RequestHeader = requestMessage.RequestHeader;
+                ctx.ClientStream = requestMessage.ContentStream;
 
                 if (InvokeHanlder(ctx, OnRequestReceived))
                 {

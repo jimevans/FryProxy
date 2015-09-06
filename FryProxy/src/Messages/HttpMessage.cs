@@ -21,13 +21,13 @@ namespace FryProxy.Messages
             _messageHeader = messageHeader;
         }
 
-        protected HttpMessage(HttpMessageHeader messageHeader, Stream body)
+        protected HttpMessage(HttpMessageHeader messageHeader, Stream contentStream)
         {
             Contract.Requires<ArgumentNullException>(messageHeader != null, "messageHeader");
 
             _messageHeader = messageHeader;
 
-            Body = body;
+            ContentStream = contentStream;
         }
 
         public HttpMessageHeader MessageHeader
@@ -35,7 +35,7 @@ namespace FryProxy.Messages
             get { return _messageHeader; }
         }
 
-        public Stream Body { get; set; }
+        public Stream ContentStream { get; set; }
 
         public bool Chunked
         {
@@ -69,7 +69,7 @@ namespace FryProxy.Messages
 
             _messageHeader = ReadHeader(stream);
 
-            Body = stream;
+            ContentStream = stream;
         }
 
         protected virtual HttpMessageHeader ReadHeader(Stream stream)
@@ -89,7 +89,7 @@ namespace FryProxy.Messages
 
             writer.WriteHttpMessageHeader(MessageHeader.StartLine, MessageHeader.Headers.Lines);
 
-            if (Body != null)
+            if (ContentStream != null)
             {
                 WriteBody(writer);
             }
@@ -99,11 +99,11 @@ namespace FryProxy.Messages
         {
             if (MessageHeader.Chunked)
             {
-                writer.WriteChunckedHttpMessageBody(Body);
+                writer.WriteChunckedHttpMessageBody(ContentStream);
             }
             else if (MessageHeader.EntityHeaders.ContentLength.HasValue)
             {
-                writer.WritePlainHttpMessageBody(Body, MessageHeader.EntityHeaders.ContentLength.Value);
+                writer.WritePlainHttpMessageBody(ContentStream, MessageHeader.EntityHeaders.ContentLength.Value);
             }
         }
     }

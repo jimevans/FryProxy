@@ -5,7 +5,7 @@ namespace FryProxy.Tests.Integration {
 
     public abstract class AbstractIntegrationTests : IntegrationTestFixture {
 
-        [TestCase("http://example.com/", "Example Domain")]
+        [TestCase("http://www.example.com/", "Example Domain")]
         [TestCase("https://www.wikipedia.org", "Wikipedia")]
         public void ShouldLoadPage(String url, String title) {
             WebDriver.Navigate().GoToUrl(url);
