@@ -4,11 +4,11 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using HttpRequestHeader = FryProxy.Headers.HttpRequestHeader;
+using FryProxy.Headers;
 
 namespace FryProxy.Handlers
 {
-    internal class DefaultEndpointConnector : HandlerSkeleton, IRemoteEndpointConnector
+    internal class EndpointConnector : HandlerSkeleton, IRemoteEndpointConnector
     {
         private static readonly Regex HostAndPortRegex = new Regex(@"(?<host>\w+):(?<port>\d+)");
 
@@ -17,7 +17,7 @@ namespace FryProxy.Handlers
         private readonly TimeSpan _socketReadTimeout;
         private readonly TimeSpan _socketWriteTimeout;
 
-        public DefaultEndpointConnector(Int32 defaultPort, TimeSpan socketWriteTimeout, TimeSpan socketReadTimeout)
+        public EndpointConnector(Int32 defaultPort, TimeSpan socketWriteTimeout, TimeSpan socketReadTimeout)
         {
             Contract.Requires<ArgumentOutOfRangeException>(defaultPort > IPEndPoint.MinPort&& defaultPort < IPEndPoint.MaxPort, "defaultPort");
             Contract.Requires<ArgumentNullException>(socketWriteTimeout != null, "socketWriteTimeout");
@@ -28,7 +28,7 @@ namespace FryProxy.Handlers
             _socketReadTimeout = socketReadTimeout;
         }
 
-        public Tuple<Socket, Stream> EstablishConnection(HttpRequestHeader requestHeader)
+        public Tuple<Socket, Stream> EstablishConnection(HttpRequestHeaders requestHeader)
         {
             Contract.Requires<ArgumentNullException>(requestHeader != null, "requestHeader");
 

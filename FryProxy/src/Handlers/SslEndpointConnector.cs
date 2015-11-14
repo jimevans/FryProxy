@@ -6,7 +6,7 @@ using System.Net.Sockets;
 
 namespace FryProxy.Handlers
 {
-    internal class SslEndpointConnector : DefaultEndpointConnector
+    internal class SslEndpointConnector : EndpointConnector
     {
         private readonly RemoteCertificateValidationCallback _certificateValidationCallback;
 

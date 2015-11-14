@@ -5,7 +5,7 @@ using FryProxy.Messages;
 
 namespace FryProxy.Handlers
 {
-    internal class DefaultHttpMessageWriter : HandlerSkeleton, IHttpMessageWriter
+    internal class HttpMessageWriter : HandlerSkeleton, IHttpMessageWriter
     {
         public void WriteHttpMessage(HttpMessage httpMessage, Stream outputStream)
         {

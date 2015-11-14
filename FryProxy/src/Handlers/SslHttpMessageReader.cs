@@ -2,12 +2,13 @@
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using FryProxy.Api;
 using FryProxy.Headers;
 using FryProxy.Messages;
 
 namespace FryProxy.Handlers
 {
-    internal class SslHttpMessageReader : DefaultHttpMessageReader
+    internal class SslHttpMessageReader : HttpMessageReader
     {
         private readonly X509Certificate _certificate;
 
@@ -22,13 +23,13 @@ namespace FryProxy.Handlers
             _certificateValidationCallback = certificateValidationCallback;
         }
 
-        public override void ReadHttpRequest(HttpRequestMessage message, Stream stream)
+        public override HttpRequestMessage ReadHttpRequest(Stream stream)
         {
-            base.ReadHttpRequest(message, stream);
+            var message = base.ReadHttpRequest(stream);
 
-            if (message.RequestMethod != RequestMethods.CONNECT)
+            if (message.RequestMethod != HttpMethods.CONNECT)
             {
-                return;
+                return message;
             }
 
             var sslStream = new SslStream(stream, false, _certificateValidationCallback);
@@ -46,7 +47,7 @@ namespace FryProxy.Handlers
                 }
             }
 
-            base.ReadHttpRequest(message, sslStream);
+            return base.ReadHttpRequest(sslStream);
         }
     }
 }

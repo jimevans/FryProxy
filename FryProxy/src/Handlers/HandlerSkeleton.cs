@@ -9,13 +9,6 @@ namespace FryProxy.Handlers
 {
     internal abstract class HandlerSkeleton
     {
-        private ILog _logger;
-
-        protected ILog Logger
-        {
-            get { return LazyInitializer.EnsureInitialized(ref _logger, () => LogManager.GetLogger(GetType())); }
-        }
-
         protected Boolean HandleSocketException(Exception ex)
         {
             if (ex.IsSocketException(SocketError.OperationAborted, SocketError.ConnectionReset))

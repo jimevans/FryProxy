@@ -85,14 +85,14 @@ namespace FryProxy.IO
         }
 
         /// <summary>
-        ///     Read <see cref="HttpMessageHeader"/> from underlying reader.
+        ///     Read <see cref="HttpMessageHeaders"/> from underlying reader.
         /// </summary>
         /// <returns>HTTP message header</returns>
-        public HttpMessageHeader ReadHttpMessageHeader()
+        public HttpMessageHeaders ReadHttpMessageHeader()
         {
-            return new HttpMessageHeader(ReadFirstLine())
+            return new HttpMessageHeaders(ReadFirstLine())
             {
-                Headers = new HttpHeaders(ReadHeaders())
+                HeadersCollection = new HttpHeadersCollection(ReadHeaders())
             };
         }
 

@@ -25,9 +25,9 @@ namespace FryProxy.Tests.Headers
         [TestCaseSource("HeadersDataSet")]
         public void ShouldReturnUnmodifiedHeaders(IList<String> headers)
         {
-            var headerCollection = new HttpHeaders(headers);
+            var headerCollection = new HttpHeadersCollection(headers);
 
-            Expect(headerCollection.Lines, Is.EqualTo(headers));
+            Expect(headerCollection.Raw, Is.EqualTo(headers));
         }
     }
 }

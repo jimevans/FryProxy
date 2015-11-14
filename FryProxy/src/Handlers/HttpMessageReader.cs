@@ -7,10 +7,12 @@ using FryProxy.Utils;
 
 namespace FryProxy.Handlers
 {
-    internal class DefaultHttpMessageReader : HandlerSkeleton, IHttpMessageReader
+    internal class HttpMessageReader : HandlerSkeleton, IHttpMessageReader
     {
-        public virtual void ReadHttpRequest(HttpRequestMessage message, Stream stream)
+        public virtual HttpRequestMessage ReadHttpRequest(Stream stream)
         {
+            var message = new HttpRequestMessage();
+
             ReadHttpMessage(message, stream);
 
             if (Logger.IsDebugEnabled)
@@ -18,22 +20,28 @@ namespace FryProxy.Handlers
                 Logger.DebugFormat("Request Received. {0}", TraceUtils.GetHttpTraceMessage(message.MessageHeader));
             }
 
-            if (message.Headers.Contains(GeneralHeaders.ProxyConnectionHeader))
+            if (message.HeadersCollection.Contains(GeneralHeaders.ProxyConnectionHeader))
             {
-                message.Headers.Remove(GeneralHeaders.ProxyConnectionHeader);
+                message.HeadersCollection.Remove(GeneralHeaders.ProxyConnectionHeader);
             }
 
             message.GeneralHeaders.Connection = "close";
+
+            return message;
         }
 
-        public void ReadHttpResponse(HttpResponseMessage message, Stream stream)
+        public HttpResponseMessage ReadHttpResponse(Stream stream)
         {
+            var message = new HttpResponseMessage();
+
             ReadHttpMessage(message, stream);
             
             if (Logger.IsDebugEnabled)
             {
                 Logger.DebugFormat("Response Received. {0}", TraceUtils.GetHttpTraceMessage(message.MessageHeader));
             }
+
+            return message;
         }
 
         private void ReadHttpMessage(HttpMessage message, Stream stream)

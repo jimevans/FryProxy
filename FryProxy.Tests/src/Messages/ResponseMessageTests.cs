@@ -93,11 +93,11 @@ namespace FryProxy.Tests.Messages
 
         private class TestCaseBuilder
         {
-            private readonly HttpMessageHeader _httpMessageHeader;
+            private readonly HttpMessageHeaders _httpMessageHeader;
             private readonly String _messageBody;
             private String _expectedMessageBody;
 
-            public TestCaseBuilder(HttpMessageHeader header, String body)
+            public TestCaseBuilder(HttpMessageHeaders header, String body)
             {
                 _messageBody = body;
                 _httpMessageHeader = header;
@@ -109,7 +109,7 @@ namespace FryProxy.Tests.Messages
                 {
                     var expectedResult = new StringBuilder().AppendLine(_httpMessageHeader.StartLine);
 
-                    foreach (var headerLine in _httpMessageHeader.Headers.Lines)
+                    foreach (var headerLine in _httpMessageHeader.HeadersCollection.Raw)
                     {
                         expectedResult.AppendLine(headerLine);
                     }

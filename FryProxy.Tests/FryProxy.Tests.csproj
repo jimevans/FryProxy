@@ -111,6 +111,7 @@
     <Compile Include="src\Integration\AbstractIntegrationTestsFixture.cs" />
     <Compile Include="src\Integration\InterceptionTests.cs" />
     <Compile Include="src\IO\HttpHeaderReaderTests.cs" />
+    <Compile Include="src\Proxy\AbstractProxyTests.cs" />
     <Compile Include="src\Utils\SocketUtilsTests.cs" />
     <Compile Include="src\Messages\ResponseMessageTests.cs" />
     <None Include="App.config" />

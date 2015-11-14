@@ -1,41 +1,42 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.IO;
+using FryProxy.Api;
 using FryProxy.Headers;
 using FryProxy.IO;
 
 namespace FryProxy.Messages
 {
-    public abstract class HttpMessage : IHttpMessageHeader
+    public abstract class HttpMessage : IHttpMessageHeaders, IHttpMessage
     {
-        private HttpMessageHeader _messageHeader;
+        private HttpMessageHeaders _messageHeader;
 
         protected HttpMessage()
         {
         }
 
-        protected HttpMessage(HttpMessageHeader messageHeader)
+        protected HttpMessage(HttpMessageHeaders messageHeader)
         {
             Contract.Requires<ArgumentNullException>(messageHeader != null, "messageHeader");
 
             _messageHeader = messageHeader;
         }
 
-        protected HttpMessage(HttpMessageHeader messageHeader, Stream contentStream)
+        protected HttpMessage(HttpMessageHeaders messageHeader, Stream body)
         {
             Contract.Requires<ArgumentNullException>(messageHeader != null, "messageHeader");
 
             _messageHeader = messageHeader;
 
-            ContentStream = contentStream;
+            Body = body;
         }
 
-        public HttpMessageHeader MessageHeader
+        public HttpMessageHeaders MessageHeader
         {
             get { return _messageHeader; }
         }
 
-        public Stream ContentStream { get; set; }
+        public Stream Body { get; set; }
 
         public bool Chunked
         {
@@ -47,9 +48,9 @@ namespace FryProxy.Messages
             get { return _messageHeader.StartLine; }
         }
 
-        public HttpHeaders Headers
+        public HttpHeadersCollection HeadersCollection
         {
-            get { return _messageHeader.Headers; }
+            get { return _messageHeader.HeadersCollection; }
         }
 
         public GeneralHeaders GeneralHeaders
@@ -69,10 +70,10 @@ namespace FryProxy.Messages
 
             _messageHeader = ReadHeader(stream);
 
-            ContentStream = stream;
+            Body = stream;
         }
 
-        protected virtual HttpMessageHeader ReadHeader(Stream stream)
+        protected virtual HttpMessageHeaders ReadHeader(Stream stream)
         {
             Contract.Requires<ArgumentNullException>(stream != null, "stream");
             Contract.Requires<ArgumentException>(stream.CanRead, "stream");
@@ -87,9 +88,9 @@ namespace FryProxy.Messages
 
             var writer = new HttpContentWriter(stream);
 
-            writer.WriteHttpMessageHeader(MessageHeader.StartLine, MessageHeader.Headers.Lines);
+            writer.WriteHttpMessageHeader(MessageHeader.StartLine, MessageHeader.HeadersCollection.Raw);
 
-            if (ContentStream != null)
+            if (Body != null)
             {
                 WriteBody(writer);
             }
@@ -99,12 +100,17 @@ namespace FryProxy.Messages
         {
             if (MessageHeader.Chunked)
             {
-                writer.WriteChunckedHttpMessageBody(ContentStream);
+                writer.WriteChunckedHttpMessageBody(Body);
             }
             else if (MessageHeader.EntityHeaders.ContentLength.HasValue)
             {
-                writer.WritePlainHttpMessageBody(ContentStream, MessageHeader.EntityHeaders.ContentLength.Value);
+                writer.WritePlainHttpMessageBody(Body, MessageHeader.EntityHeaders.ContentLength.Value);
             }
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }

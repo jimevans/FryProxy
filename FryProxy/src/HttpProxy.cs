@@ -10,8 +10,8 @@ namespace FryProxy
     {
         private const Int32 DefaultHttpPort = 80;
 
-        private static readonly IHttpMessageReader MessageReader = new DefaultHttpMessageReader();
-        private static readonly IHttpMessageWriter MessageWriter = new DefaultHttpMessageWriter();
+        private static readonly IHttpMessageReader MessageReader = new HttpMessageReader();
+        private static readonly IHttpMessageWriter MessageWriter = new HttpMessageWriter();
 
         private readonly IRemoteEndpointConnector _remoteEndpointConnector;
 
@@ -23,7 +23,7 @@ namespace FryProxy
         /// </param>
         public HttpProxy(Int32 defaultPort = DefaultHttpPort) : base(defaultPort)
         {
-            _remoteEndpointConnector = new DefaultEndpointConnector(defaultPort, ServerWriteTimeout, ServerReadTimeout);
+            _remoteEndpointConnector = new EndpointConnector(defaultPort, ServerWriteTimeout, ServerReadTimeout);
         }
 
         protected override IHttpMessageReader HttpMessageReader

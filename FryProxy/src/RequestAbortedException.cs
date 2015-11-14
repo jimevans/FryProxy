@@ -7,10 +7,14 @@ namespace FryProxy
 {
     public class RequestAbortedException : Exception
     {
+        public RequestAbortedException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
         public RequestAbortedException(
             String reason,
             Exception innerException,
-            HttpRequestHeader requestHeader = null,
+            HttpRequestHeaders requestHeader = null,
             HttpResponseHeader responseHeader = null)
             : base(BuildErrorMessage(reason, requestHeader, responseHeader), innerException)
         {
@@ -18,7 +22,7 @@ namespace FryProxy
 
         public RequestAbortedException(
             String reason = null,
-            HttpRequestHeader requestHeader = null,
+            HttpRequestHeaders requestHeader = null,
             HttpResponseHeader responseHeader = null)
             : base(BuildErrorMessage(reason, requestHeader, responseHeader))
         {
@@ -26,7 +30,7 @@ namespace FryProxy
 
         private static String BuildErrorMessage(
             String reason = null,
-            HttpRequestHeader requestHeader = null,
+            HttpRequestHeaders requestHeader = null,
             HttpResponseHeader responseHeader = null)
         {
             var messageBuilder = new StringBuilder();

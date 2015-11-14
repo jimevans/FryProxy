@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using FryProxy.Handlers;
-using FryProxy.Messages;
 using FryProxy.Utils;
 using log4net;
 
@@ -132,11 +131,9 @@ namespace FryProxy
                 ClientSocket = socket
             };
 
-            var requestMessage = new HttpRequestMessage();
-            var responseMessage = new HttpResponseMessage();
-
             Socket serverSocket = null;
-            Stream serverStream = null, clientStream = null;
+            Stream serverStream = null;
+            Stream clientStream = null;
 
             try
             {
@@ -146,9 +143,9 @@ namespace FryProxy
                     WriteTimeout = (Int32) ClientWriteTimeout.TotalMilliseconds
                 };
 
-                HttpMessageReader.ReadHttpRequest(requestMessage, ctx.ClientStream);
+                var requestMessage = HttpMessageReader.ReadHttpRequest(ctx.ClientStream);
                 ctx.RequestHeader = requestMessage.RequestHeader;
-                ctx.ClientStream = requestMessage.ContentStream;
+                ctx.ClientStream = requestMessage.Body;
 
                 if (InvokeHanlder(ctx, OnRequestReceived))
                 {
@@ -156,7 +153,7 @@ namespace FryProxy
                 }
 
                 var serverSocketAndStream = RemoteEndpointConnector.EstablishConnection(requestMessage.RequestHeader);
-                ctx.ServerSocket = serverSocket = serverSocketAndStream.Item1;
+                serverSocket = serverSocketAndStream.Item1;
                 ctx.ServerStream = serverStream = serverSocketAndStream.Item2;
 
                 if (InvokeHanlder(ctx, OnServerConnected))
@@ -165,7 +162,8 @@ namespace FryProxy
                 }
 
                 HttpMessageWriter.WriteHttpMessage(requestMessage, ctx.ServerStream);
-                HttpMessageReader.ReadHttpResponse(responseMessage, ctx.ServerStream);
+                
+                var responseMessage = HttpMessageReader.ReadHttpResponse(ctx.ServerStream);
                 ctx.ResponseHeader = responseMessage.ResponseHeader;
 
                 if (InvokeHanlder(ctx, OnResponseReceived))

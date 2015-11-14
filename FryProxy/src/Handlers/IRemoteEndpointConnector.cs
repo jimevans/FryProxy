@@ -7,6 +7,6 @@ namespace FryProxy.Handlers
 {
     public interface IRemoteEndpointConnector
     {
-        Tuple<Socket, Stream> EstablishConnection(HttpRequestHeader requestHeader);
+        Tuple<Socket, Stream> EstablishConnection(HttpRequestHeaders requestHeader);
     }
 }

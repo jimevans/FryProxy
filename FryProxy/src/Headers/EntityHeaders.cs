@@ -1,8 +1,10 @@
 ﻿using System;
+using FryProxy.Api;
 
 namespace FryProxy.Headers {
 
-    public sealed class EntityHeaders {
+    public sealed class EntityHeaders : IHttpEntityHeaders
+    {
 
         public const String AllowHeader = "Allow";
 
@@ -18,45 +20,45 @@ namespace FryProxy.Headers {
         public const String ContentLocationHeader = "Content-Location";
         public const String ContentEncodingHeader = "Content-Encoding";
 
-        private readonly HttpHeaders _headers;
+        private readonly HttpHeadersCollection _headersCollection;
 
-        public EntityHeaders(HttpHeaders headers) {
-            _headers = headers;
+        public EntityHeaders(HttpHeadersCollection headersCollection) {
+            _headersCollection = headersCollection;
         }
 
         public String Allow {
-            get { return _headers[AllowHeader]; }
-            set { _headers[AllowHeader] = value; }
+            get { return _headersCollection[AllowHeader]; }
+            set { _headersCollection[AllowHeader] = value; }
         }
 
         public String Expires {
-            get { return _headers[ExpiresHeader]; }
-            set { _headers[ExpiresHeader] = value; }
+            get { return _headersCollection[ExpiresHeader]; }
+            set { _headersCollection[ExpiresHeader] = value; }
         }
 
         public String LastModified {
-            get { return _headers[LastModifiedHeader]; }
-            set { _headers[LastModifiedHeader] = value; }
+            get { return _headersCollection[LastModifiedHeader]; }
+            set { _headersCollection[LastModifiedHeader] = value; }
         }
 
         public String ContentMD5 {
-            get { return _headers[ContentMD5Header]; }
-            set { _headers[ContentMD5Header] = value; }
+            get { return _headersCollection[ContentMD5Header]; }
+            set { _headersCollection[ContentMD5Header] = value; }
         }
 
         public String ContentType {
-            get { return _headers[ContentTypeHeader]; }
-            set { _headers[ContentTypeHeader] = value; }
+            get { return _headersCollection[ContentTypeHeader]; }
+            set { _headersCollection[ContentTypeHeader] = value; }
         }
 
         public String ContentRange {
-            get { return _headers[ContentRangeHeader]; }
-            set { _headers[ContentRangeHeader] = value; }
+            get { return _headersCollection[ContentRangeHeader]; }
+            set { _headersCollection[ContentRangeHeader] = value; }
         }
 
         public Int64? ContentLength {
             get {
-                var contentLength = _headers[ContentLengthHeader];
+                var contentLength = _headersCollection[ContentLengthHeader];
 
                 if (contentLength != null) {
                     return Int64.Parse(contentLength);
@@ -64,22 +66,22 @@ namespace FryProxy.Headers {
 
                 return null;
             }
-            set { _headers[ContentLengthHeader] = value.HasValue ? value.Value.ToString() : null; }
+            set { _headersCollection[ContentLengthHeader] = value.HasValue ? value.Value.ToString() : null; }
         }
 
         public String ContentLanguage {
-            get { return _headers[ContentLanguageHeader]; }
-            set { _headers[ContentLanguageHeader] = value; }
+            get { return _headersCollection[ContentLanguageHeader]; }
+            set { _headersCollection[ContentLanguageHeader] = value; }
         }
 
         public String ContentLocation {
-            get { return _headers[ContentLocationHeader]; }
-            set { _headers[ContentLocationHeader] = value; }
+            get { return _headersCollection[ContentLocationHeader]; }
+            set { _headersCollection[ContentLocationHeader] = value; }
         }
 
         public String ContentEncoding {
-            get { return _headers[ContentEncodingHeader]; }
-            set { _headers[ContentEncodingHeader] = value; }
+            get { return _headersCollection[ContentEncodingHeader]; }
+            set { _headersCollection[ContentEncodingHeader] = value; }
         }
 
     }

@@ -7,7 +7,7 @@ namespace FryProxy.Utils
 {
     public static class TraceUtils
     {
-        public static void WriteHttpTraceMessage(this StringBuilder stringBuilder, HttpMessageHeader messageHeader)
+        public static void WriteHttpTraceMessage(this StringBuilder stringBuilder, HttpMessageHeaders messageHeader)
         {
             if (messageHeader == null)
             {
@@ -18,7 +18,7 @@ namespace FryProxy.Utils
                 .AppendFormat("StartLine: {0}", messageHeader.StartLine)
                 .AppendLine();
 
-            var headers = messageHeader.Headers.Lines.ToList();
+            var headers = messageHeader.HeadersCollection.Raw.ToList();
 
             if (headers.Count == 0)
             {
@@ -35,7 +35,7 @@ namespace FryProxy.Utils
             }
         }
 
-        public static String GetHttpTraceMessage(HttpMessageHeader header)
+        public static String GetHttpTraceMessage(HttpMessageHeaders header)
         {
             if (header == null)
             {

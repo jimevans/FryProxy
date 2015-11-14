@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using HttpRequestHeader = FryProxy.Headers.HttpRequestHeader;
+using FryProxy.Headers;
 using HttpResponseHeader = FryProxy.Headers.HttpResponseHeader;
 
 namespace FryProxy
@@ -30,7 +30,7 @@ namespace FryProxy
         /// <summary>
         ///     HTTP message header received from client
         /// </summary>
-        public HttpRequestHeader RequestHeader { get; set; }
+        public HttpRequestHeaders RequestHeader { get; set; }
 
         /// <summary>
         ///     HTTP message header received from destination server
