@@ -12,14 +12,14 @@ namespace FryProxy
     ///     Handler for <see cref="AbstractHttpProxy.ConnectionAcceped" /> event
     /// </summary>
     /// <param name="endPoint">Client IP address and port number</param>
-    public delegate void ConnectionAcceptedEventHandler(EndPoint endPoint);
+    public delegate void ConnectionEventHandler(EndPoint endPoint);
 
     /// <summary>
     ///     Handler for events associated with receiving client request
     /// </summary>
     /// <seealso cref="AbstractHttpProxy.RequestReceived" />
     /// <param name="requestMessage">HTTP message recevied from client</param>
-    public delegate void RequestReceivedEventHandler(HttpRequestMessage requestMessage);
+    public delegate void RequestEventHandler(HttpRequestMessage requestMessage);
 
     /// <summary>
     ///     Handler for events associated with receiving response from remote server
@@ -27,7 +27,7 @@ namespace FryProxy
     /// <seealso cref="AbstractHttpProxy.ResponseReceived" />
     /// <seealso cref="AbstractHttpProxy.ResponseSent" />
     /// <param name="responseMessage"></param>
-    public delegate void ResponseReceivedEventHandler(HttpResponseMessage responseMessage);
+    public delegate void ResponseEventHandler(HttpResponseMessage responseMessage);
 
     /// <summary>
     ///     Defines basic request procssing flow which include following:
@@ -75,22 +75,22 @@ namespace FryProxy
         /// <summary>
         ///     Event fired when proxy receives client connection before any processing is done
         /// </summary>
-        public event ConnectionAcceptedEventHandler ConnectionAcceped;
+        public event ConnectionEventHandler ConnectionAcceped;
 
         /// <summary>
         ///     Event fired once request headers received from client
         /// </summary>
-        public event RequestReceivedEventHandler RequestReceived;
+        public event RequestEventHandler RequestReceived;
 
         /// <summary>
         ///     Event fired after response headers recevied from remote server
         /// </summary>
-        public event ResponseReceivedEventHandler ResponseReceived;
+        public event ResponseEventHandler ResponseReceived;
 
         /// <summary>
         ///     Event fired after server response was send to client
         /// </summary>
-        public event ResponseReceivedEventHandler ResponseSent;
+        public event ResponseEventHandler ResponseSent;
 
         /// <summary>
         ///     Start request prcessing flow.
