@@ -1,79 +1,49 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
-using System.Text;
 using FryProxy.Handlers;
-using FryProxy.Utils;
-using log4net;
 
 namespace FryProxy
 {
     /// <summary>
-    ///     Basic HTTP proxy. Implements request processing flow 
-    ///     and delegates interaction with network protocols to descendants.
+    /// Handler for <see cref="AbstractHttpProxy.ConnectionAcceped"/> event
+    /// </summary>
+    /// <param name="endPoint">Client IP address and port number</param>
+    public delegate void ConnectionAcceptedEventHandler(IPEndPoint endPoint);
+
+    /// <summary>
+    /// Handler for events associated with receiving client request
+    /// </summary>
+    /// <seealso cref="AbstractHttpProxy.RequestReceived"/>
+    /// <param name="requestMessage">HTTP message recevied from client</param>
+    public delegate void RequestReceivedEventHandler(HttpRequestMessage requestMessage);
+
+    /// <summary>
+    /// Handler for events associated with receiving response from remote server
+    /// </summary>
+    /// <seealso cref="AbstractHttpProxy.ResponseReceived"/>
+    /// <seealso cref="AbstractHttpProxy.ResponseSent"/>
+    /// <param name="responseMessage"></param>
+    public delegate void ResponseReceivedEventHandler(HttpResponseMessage responseMessage);
+
+    /// <summary>
+    /// Defines basic request procssing flow which include following:
+    /// - fire <see cref="ConnectionAcceped"/> event once connectin is received
+    /// - receive client request and fire <see cref="RequestReceived"/> event
+    /// - reply client request to destination server
+    /// - receive respons from destination server and fire <see cref="ResponseReceived"/> event
+    /// - reply to client with server response and send <see cref="ResponseSent"/> event
     /// </summary>
     public abstract class AbstractHttpProxy
     {
-        protected readonly ILog Logger;
+        protected readonly IHttpMessageWriter MessageWriter;
 
-        private readonly Int32 _defaultPort;
-
-        /// <summary>
-        ///     Create new instance of HTTP proxy. All timeouts will be initialized with default values.
-        /// </summary>
-        /// <param name="defaultPort">
-        ///     Port number on destination server which will be used if not specified in request
-        /// </param>
-        protected AbstractHttpProxy(int defaultPort)
+        protected AbstractHttpProxy(IHttpMessageWriter messageWriter)
         {
-            Contract.Requires<ArgumentOutOfRangeException>(
-                defaultPort > IPEndPoint.MinPort
-                && defaultPort < IPEndPoint.MaxPort, "defaultPort"
-                );
-
-            _defaultPort = defaultPort;
-
-            ClientReadTimeout = TimeSpan.FromSeconds(5);
-            ClientWriteTimeout = TimeSpan.FromSeconds(5);
-            ServerReadTimeout = TimeSpan.FromSeconds(15);
-            ServerWriteTimeout = TimeSpan.FromSeconds(15);
-
-            Logger = LogManager.GetLogger(GetType());
+            MessageWriter = messageWriter;
         }
-
-        /// <summary>
-        ///     Called when all other stages of request processing are done.
-        ///     All <see cref="ProcessingContext" /> information should be available now.
-        /// </summary>
-        public Action<ProcessingContext> OnProcessingComplete { get; set; }
-
-        /// <summary>
-        ///     Called when request from client is received by proxy.
-        ///     <see cref="ProcessingContext.RequestHeader" /> and <see cref="ProcessingContext.ClientStream" /> are available at
-        ///     this stage.
-        /// </summary>
-        public Action<ProcessingContext> OnRequestReceived { get; set; }
-
-        /// <summary>
-        ///     Called when response from destination server is received by proxy.
-        ///     <see cref="ProcessingContext.ResponseHeader" /> is added at this stage.
-        /// </summary>
-        public Action<ProcessingContext> OnResponseReceived { get; set; }
-
-        /// <summary>
-        ///     Called when server response has been relayed to client.
-        ///     All <see cref="ProcessingContext" /> information should be available.
-        /// </summary>
-        public Action<ProcessingContext> OnResponseSent { get; set; }
-
-        /// <summary>
-        ///     Called when proxy has established connection to destination server.
-        ///     <see cref="ProcessingContext.ServerEndPoint" /> and <see cref="ProcessingContext.ServerStream" /> are defined at
-        ///     this stage.
-        /// </summary>
-        public Action<ProcessingContext> OnServerConnected { get; set; }
 
         /// <summary>
         ///     Client socket read timeout
@@ -96,155 +66,61 @@ namespace FryProxy
         public TimeSpan ServerWriteTimeout { get; set; }
 
         /// <summary>
-        ///     Port number on destination server which will be used if not specified in request
+        /// Event fired when proxy receives client connection before any processing is done
         /// </summary>
-        public Int32 DefaultPort
+        public event ConnectionAcceptedEventHandler ConnectionAcceped;
+
+        /// <summary>
+        /// Event fired once request headers received from client
+        /// </summary>
+        public event RequestReceivedEventHandler RequestReceived;
+
+        /// <summary>
+        /// Event fired after response headers recevied from remote server
+        /// </summary>
+        public event ResponseReceivedEventHandler ResponseReceived;
+
+        /// <summary>
+        /// Event fired after server response was send to client
+        /// </summary>
+        public event ResponseReceivedEventHandler ResponseSent;
+
+        public void AcceptSocket(Socket socket)
         {
-            get { return _defaultPort; }
-        }
-
-        /// <summary>
-        ///     Object used for reading request and response HTTP messages
-        /// </summary>
-        protected abstract IHttpMessageReader HttpMessageReader { get; }
-
-        /// <summary>
-        ///     Object used for writing request and reponse HTTP messages
-        /// </summary>
-        protected abstract IHttpMessageWriter HttpMessageWriter { get; }
-
-        /// <summary>
-        ///     Object used for opening sockets to remote servers and wrapping opened socket in stream
-        /// </summary>
-        protected abstract IRemoteEndpointConnector RemoteEndpointConnector { get; }
-
-        /// <summary>
-        ///     Handle request by reading client request, connecting to original destination endpoint,
-        ///     relay message to it and relay response back to client. Also trigger custom request 
-        ///     handlers on appropriate processing stages.
-        /// </summary>
-        /// <param name="socket">socket opened by proxy client</param>
-        public void AcceptClientSocket(Socket socket)
-        {
-            var ctx = new ProcessingContext
-            {
-                ClientSocket = socket
-            };
-
-            Socket serverSocket = null;
-            Stream serverStream = null;
-            Stream clientStream = null;
+            HttpRequestMessage requestMessage = null;
+            HttpResponseMessage responseMessage = null;
 
             try
             {
-                ctx.ClientStream = clientStream = new NetworkStream(socket, true)
+                ConnectionAcceped?.Invoke(socket.RemoteEndPoint as IPEndPoint);
+
+                var clientStream = new NetworkStream(socket, true)
                 {
-                    ReadTimeout = (Int32) ClientReadTimeout.TotalMilliseconds,
-                    WriteTimeout = (Int32) ClientWriteTimeout.TotalMilliseconds
+                    ReadTimeout = (int) ClientReadTimeout.TotalMilliseconds,
+                    WriteTimeout = (int) ClientWriteTimeout.TotalMilliseconds
                 };
 
-                var requestMessage = HttpMessageReader.ReadHttpRequest(ctx.ClientStream);
-                ctx.RequestHeader = requestMessage.RequestHeader;
-                ctx.ClientStream = requestMessage.Body;
+                requestMessage = ReadRequest(clientStream);
 
-                if (InvokeHanlder(ctx, OnRequestReceived))
-                {
-                    return;
-                }
+                RequestReceived?.Invoke(requestMessage);
 
-                var serverSocketAndStream = RemoteEndpointConnector.EstablishConnection(requestMessage.RequestHeader);
-                serverSocket = serverSocketAndStream.Item1;
-                ctx.ServerStream = serverStream = serverSocketAndStream.Item2;
+                responseMessage = ReceiveResponse(requestMessage);
 
-                if (InvokeHanlder(ctx, OnServerConnected))
-                {
-                    return;
-                }
+                ResponseReceived?.Invoke(responseMessage);
 
-                HttpMessageWriter.WriteHttpMessage(requestMessage, ctx.ServerStream);
-                
-                var responseMessage = HttpMessageReader.ReadHttpResponse(ctx.ServerStream);
-                ctx.ResponseHeader = responseMessage.ResponseHeader;
+                MessageWriter.Write(responseMessage, clientStream);
 
-                if (InvokeHanlder(ctx, OnResponseReceived))
-                {
-                    return;
-                }
-
-                HttpMessageWriter.WriteHttpMessage(responseMessage, ctx.ClientStream);
-                
-                InvokeHanlder(ctx, OnResponseSent);
-            }
-            catch (RequestAbortedException ex)
-            {
-                Logger.Warn("Request Aborted", ex);
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, ctx);
+                ResponseSent?.Invoke(responseMessage);
             }
             finally
             {
-                ctx.StopProcessing();
-
-                try
-                {
-                    foreach (var stream in new[] {clientStream, serverStream, ctx.ClientStream, ctx.ServerStream})
-                    {
-                        if (stream != null)
-                        {
-                            stream.Close();
-                        }
-                    }
-
-                    if (serverSocket != null)
-                    {
-                        serverSocket.Close();
-                    }
-
-                    InvokeHanlder(ctx, OnProcessingComplete);
-                }
-                catch (Exception ex)
-                {
-                    LogException(ex, ctx);
-                }
+                responseMessage?.Dispose();
+                requestMessage?.Dispose();
             }
         }
 
-        private void LogException(Exception ex, ProcessingContext ctx)
-        {
-            var errorMessage = new StringBuilder("Request processing failed.");
+        protected abstract HttpRequestMessage ReadRequest(Stream stream);
 
-            errorMessage.AppendLine();
-
-            if (ctx.RequestHeader != null)
-            {
-                errorMessage.AppendLine("Request:");
-                errorMessage.WriteHttpTraceMessage(ctx.RequestHeader);
-            }
-
-            if (ctx.ResponseHeader != null)
-            {
-                errorMessage.AppendLine("Response:");
-                errorMessage.WriteHttpTraceMessage(ctx.ResponseHeader);
-            }
-
-            errorMessage.AppendLine("Exception:");
-            errorMessage.AppendLine(ex.ToString());
-
-            Logger.Error(errorMessage.ToString());
-        }
-
-        private static Boolean InvokeHanlder(ProcessingContext context, Action<ProcessingContext> handler)
-        {
-            if (handler == null)
-            {
-                return false;
-            }
-
-            handler(context);
-
-            return context.Processed;
-        }
+        protected abstract HttpResponseMessage ReceiveResponse(HttpRequestMessage request);
     }
 }
