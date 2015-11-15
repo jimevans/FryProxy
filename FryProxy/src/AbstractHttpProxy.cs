@@ -136,6 +136,11 @@ namespace FryProxy
             }
         }
 
+        /// <summary>
+        ///     Create stream over client socket
+        /// </summary>
+        /// <param name="socket">Socket through which proxy communicates with client</param>
+        /// <returns>Stream wrapping given socket</returns>
         protected abstract Stream CreateClientStream(Socket socket);
 
         /// <summary>
