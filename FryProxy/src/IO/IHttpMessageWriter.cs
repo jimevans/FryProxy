@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net.Http;
 
-namespace FryProxy.Handlers
+namespace FryProxy.IO
 {
     /// <summary>
     /// Define contract for serializing HTTP messages
