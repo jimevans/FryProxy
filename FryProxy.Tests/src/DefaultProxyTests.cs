@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using FryProxy.IO;
+using log4net.Config;
 using Moq;
 using NUnit.Framework;
 
@@ -27,6 +28,8 @@ namespace FryProxy.Tests
 
         public DefaultProxyTests()
         {
+            BasicConfigurator.Configure();
+
             var mockRepository = new MockRepository(MockBehavior.Loose);
 
             _messageReaderMock = mockRepository.Create<IHttpMessageReader>();

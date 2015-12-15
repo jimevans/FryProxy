@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace FryProxy.IO
 {
-    public class DefaultRemoteConnector : IRemoteEndpointConnector
+    internal class DefaultRemoteConnector : IRemoteEndpointConnector
     {
         public Socket Connect(EndPoint remotEndPoint)
         {

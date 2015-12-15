@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace FryProxy.IO
 {
-    public class DefaultStreamFactory : IStreamFactory
+    internal class DefaultStreamFactory : IStreamFactory
     {
         public Stream CreateStream(Socket socket)
         {
