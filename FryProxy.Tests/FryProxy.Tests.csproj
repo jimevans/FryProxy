@@ -83,7 +83,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
@@ -125,11 +124,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FryProxy\FryProxy.csproj">
-      <Project>{7FEDA61E-ED0A-4357-932E-746C697E464E}</Project>
+      <Project>{81b39424-e72e-4279-97cb-1e88ae62bd27}</Project>
       <Name>FryProxy</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,10 +6,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using FryProxy.Headers;
+using FryProxy.Logging;
 using FryProxy.Readers;
 using FryProxy.Utils;
 using FryProxy.Writers;
-using log4net;
 using HttpRequestHeader = FryProxy.Headers.HttpRequestHeader;
 using HttpResponseHeader = FryProxy.Headers.HttpResponseHeader;
 
@@ -21,8 +21,6 @@ namespace FryProxy
     public class HttpProxy
     {
         protected const Int32 DefaultHttpPort = 80;
-
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof (HttpProxy));
 
         private static readonly TimeSpan DefaultCommunicationTimeout = TimeSpan.FromSeconds(1);
 
@@ -81,6 +79,8 @@ namespace FryProxy
                 {ProcessingStage.SendResponse, SendResponse + _onResponseSentWrapper}
             });
         }
+
+        public event EventHandler<LogEventArgs> Log;
 
         /// <summary>
         ///     Called when all other stages of request processing are done.
@@ -194,7 +194,7 @@ namespace FryProxy
                 errorMessage.AppendLine("Exception:");
                 errorMessage.AppendLine(context.Exception.ToString());
 
-                Logger.Error(errorMessage.ToString());
+                OnLog(LogLevel.Error, errorMessage.ToString());
             }
         }
 
@@ -209,15 +209,13 @@ namespace FryProxy
             Contract.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
 
             var headerReader = new HttpHeaderReader(new PlainStreamReader(context.ClientStream));
+            headerReader.Log += this.OnComponentLog;
 
             try
             {
                 context.RequestHeader = new HttpRequestHeader(headerReader.ReadHttpMessageHeader());
 
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.DebugFormat("Request Received. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
-                }
+                OnLog(LogLevel.Debug, "Request Received. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
 
                 if (context.RequestHeader.Headers.Contains(GeneralHeaders.ProxyConnectionHeader))
                 {
@@ -230,15 +228,15 @@ namespace FryProxy
             {
                 if (ex.IsSocketException(SocketError.OperationAborted, SocketError.ConnectionReset))
                 {
-                    Logger.WarnFormat("Request was terminated by client. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
+                    OnLog(LogLevel.Warn, "Request was terminated by client. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
                 } 
                 else if (ex is EndOfStreamException)
                 {
-                    Logger.ErrorFormat("Failed to read request. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
+                    OnLog(LogLevel.Error, "Failed to read request. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
                 } 
                 else if(ex.IsSocketException(SocketError.TimedOut))
                 {
-                    Logger.WarnFormat("Client request time out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));    
+                    OnLog(LogLevel.Warn, "Client request time out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));    
                 }
                 else
                 {
@@ -272,13 +270,11 @@ namespace FryProxy
 
             context.ServerStream = new NetworkStream(context.ServerSocket, true);
 
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Connection Established: {0}:{1}",
-                    context.ServerEndPoint.Host,
-                    context.ServerEndPoint.Port
-                );
-            }
+            OnLog(LogLevel.Debug,
+                "Connection Established: {0}:{1}",
+                context.ServerEndPoint.Host,
+                context.ServerEndPoint.Port
+            );
         }
 
         /// <summary>
@@ -298,17 +294,17 @@ namespace FryProxy
             Contract.Requires<InvalidContextException>(context.ClientSocket != null, "ClientSocket");
 
             var requestWriter = new HttpMessageWriter(context.ServerStream);
+            requestWriter.Log += this.OnComponentLog;
+
             var responseReader = new HttpHeaderReader(new PlainStreamReader(context.ServerStream));
+            responseReader.Log += this.OnComponentLog;
 
             try
             {
                 requestWriter.Write(context.RequestHeader, context.ClientStream, context.ClientSocket.Available);
                 context.ResponseHeader = new HttpResponseHeader(responseReader.ReadHttpMessageHeader());
 
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.DebugFormat("Response Received: {0}", TraceUtils.GetHttpTrace(context.ResponseHeader));
-                }
+                OnLog(LogLevel.Debug, "Response Received: {0}", TraceUtils.GetHttpTrace(context.ResponseHeader));
             }
             catch (IOException ex)
             {
@@ -316,7 +312,7 @@ namespace FryProxy
 
                 if (ex.IsSocketException(SocketError.TimedOut))
                 {
-                    Logger.WarnFormat("Request to remote server has timed out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
+                    OnLog(LogLevel.Warn, "Request to remote server has timed out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
 
                     responseWriter.WriteGatewayTimeout();
                 }
@@ -351,25 +347,19 @@ namespace FryProxy
             {
                 responseWriter.Write(context.ResponseHeader, context.ServerStream, context.ServerSocket.Available);
 
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.DebugFormat("Response Sent. {0}", TraceUtils.GetHttpTrace(context.ResponseHeader));
-                }
+                OnLog(LogLevel.Debug, "Response Sent. {0}", TraceUtils.GetHttpTrace(context.ResponseHeader));
             }
             catch (IOException ex)
             {
                 if (ex.IsSocketException(SocketError.TimedOut))
                 {
-                    Logger.WarnFormat("Request to remote server has timed out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
+                    OnLog(LogLevel.Warn, "Request to remote server has timed out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
 
                     responseWriter.WriteGatewayTimeout();
                 }
                 else if (ex.IsSocketException(SocketError.ConnectionReset, SocketError.ConnectionAborted))
                 {
-                    if (Logger.IsDebugEnabled)
-                    {
-                        Logger.DebugFormat("Request Aborted. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
-                    }
+                    OnLog(LogLevel.Debug, "Request Aborted. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
                 }
                 else
                 {
@@ -400,9 +390,23 @@ namespace FryProxy
                 context.ServerStream.Close();
             }
 
-            if (Logger.IsDebugEnabled)
+            OnLog(LogLevel.Debug, "[{0}] processed", context.RequestHeader.StartLine);
+        }
+
+        protected void OnLog(LogLevel level, string template, params object[] args)
+        {
+            if (this.Log != null)
             {
-                Logger.DebugFormat("[{0}] processed", context.RequestHeader.StartLine);
+                LogEventArgs e = new LogEventArgs(typeof(HttpProxy), level, template, args);
+                this.Log(this, e);
+            }
+        }
+
+        protected void OnComponentLog(object sender, LogEventArgs e)
+        {
+            if (this.Log != null)
+            {
+                this.Log(sender, e);
             }
         }
     }

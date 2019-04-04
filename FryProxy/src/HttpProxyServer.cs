@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FryProxy.Logging;
+using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
@@ -47,6 +48,7 @@ namespace FryProxy {
             Contract.Requires<ArgumentNullException>(httpProxy != null, "httpProxy");
 
             _worker = new HttpProxyWorker(proxyEndPoint, httpProxy);
+            _worker.Log += this.OnComponentLog;
         }
 
         /// <summary>
@@ -69,6 +71,8 @@ namespace FryProxy {
         public Boolean IsListening {
             get { return _worker.Active; }
         }
+
+        public event EventHandler<LogEventArgs> Log;
 
         private static IPEndPoint ToIPEndPoint(DnsEndPoint proxyEndPoint) {
             Contract.Requires<ArgumentNullException>(proxyEndPoint != null, "proxyEndPoint");
@@ -98,6 +102,22 @@ namespace FryProxy {
             _worker.Stop();
         }
 
+        protected void OnLog(LogLevel level, string template, params object[] args)
+        {
+            if (this.Log != null)
+            {
+                LogEventArgs e = new LogEventArgs(typeof(HttpProxy), level, template, args);
+                this.Log(this, e);
+            }
+        }
+
+        protected void OnComponentLog(object sender, LogEventArgs e)
+        {
+            if (this.Log != null)
+            {
+                this.Log(sender, e);
+            }
+        }
     }
 
 }

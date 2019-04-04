@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using log4net;
+using FryProxy.Logging;
 
 namespace FryProxy
 {
@@ -13,7 +13,6 @@ namespace FryProxy
         private readonly HttpProxy _httpProxy;
         private readonly TcpListener _listener;
 
-        private readonly ILog _logger = LogManager.GetLogger(typeof (HttpProxyWorker));
         private readonly ISet<Socket> _openSockets;
         private Thread _acceptSocketThread;
         private Boolean _shuttingDown;
@@ -28,6 +27,7 @@ namespace FryProxy
             _openSockets = new HashSet<Socket>();
             _httpProxy = httpProxy;
             _listener = listener;
+            _httpProxy.Log += OnHttpProxyLog;
         }
 
         public IPEndPoint LocalEndPoint
@@ -44,6 +44,8 @@ namespace FryProxy
         {
             get { return _listener.Server.IsBound; }
         }
+
+        public event EventHandler<LogEventArgs> Log;
 
         public void Start(EventWaitHandle startEventHandle)
         {
@@ -66,7 +68,7 @@ namespace FryProxy
 
                 waitHandle.Wait();
 
-                _logger.DebugFormat("started on {0}", LocalEndPoint);
+                OnLog(LogLevel.Debug, "started on {0}", LocalEndPoint);
             }
 
             startEventHandle.Set();
@@ -83,7 +85,7 @@ namespace FryProxy
 
             do
             {
-                _logger.Debug("Begin Accept Socket");
+                OnLog(LogLevel.Debug, "Begin Accept Socket");
 
                 try
                 {
@@ -95,10 +97,7 @@ namespace FryProxy
                 }
             } while (!_shuttingDown && resetHandle.WaitOne());
 
-            if (_logger.IsDebugEnabled)
-            {
-                _logger.Debug("Socket Accept loop finished");
-            }
+            OnLog(LogLevel.Debug, "Socket Accept loop finished");
         }
 
         private void AcceptClientSocket(IAsyncResult ar)
@@ -130,7 +129,7 @@ namespace FryProxy
 
             ThreadPool.QueueUserWorkItem(ignore => HandleSocket(socket));
 
-            _logger.Debug("End Accept Socket");
+            OnLog(LogLevel.Debug, "End Accept Socket");
         }
 
         private void HandleSocket(Socket socket)
@@ -146,7 +145,7 @@ namespace FryProxy
             }
             catch (Exception ex)
             {
-                _logger.Debug("Failed to handle client request", ex);
+                OnLog(LogLevel.Debug, "Failed to handle client request", ex);
             }
 
             socket.Close();
@@ -177,7 +176,7 @@ namespace FryProxy
                 }
                 catch (Exception ex)
                 {
-                    _logger.Debug("Error occured while stopping", ex);
+                    OnLog(LogLevel.Debug, "Error occured while stopping", ex);
                 }
 
                 try
@@ -186,7 +185,7 @@ namespace FryProxy
                 }
                 catch (Exception ex)
                 {
-                    _logger.Debug("Error while stopping", ex);
+                    OnLog(LogLevel.Debug, "Error while stopping", ex);
                 }
             }
 
@@ -200,7 +199,25 @@ namespace FryProxy
                 _openSockets.Clear();
             }
 
-            _logger.DebugFormat("stopped on {0}", LocalEndPoint.Address);
+            OnLog(LogLevel.Debug, "stopped on {0}", LocalEndPoint.Address);
+        }
+
+        protected void OnLog(LogLevel level, string template, params object[] args)
+        {
+            if (this.Log != null)
+            {
+                LogEventArgs e = new LogEventArgs(typeof(HttpProxy), level, template, args);
+                this.Log(this, e);
+            }
+        }
+
+        private void OnHttpProxyLog(object sender, LogEventArgs e)
+        {
+            // Bubble up the log event from components.
+            if (this.Log != null)
+            {
+                this.Log(sender, e);
+            }
         }
     }
 }

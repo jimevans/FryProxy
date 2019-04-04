@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using CommandLine;
+using FryProxy.Logging;
+using log4net;
 using log4net.Config;
 
 namespace FryProxy.ConsoleApp
@@ -52,6 +54,7 @@ namespace FryProxy.ConsoleApp
                 var httpProxyServer = options.HttpPort == 0 
                     ? new HttpProxyServer(options.Host, new HttpProxy())
                     : new HttpProxyServer(options.Host, options.HttpPort, new HttpProxy());
+                httpProxyServer.Log += OnLog;
 
                 var sslProxyServer = options.SslPort == 0
                     ? new HttpProxyServer(options.Host, new SslProxy(Certificate))
@@ -80,6 +83,29 @@ namespace FryProxy.ConsoleApp
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+            }
+        }
+
+        private static void OnLog(object sender, LogEventArgs e)
+        {
+            ILog logger = LogManager.GetLogger(e.ComponentType);
+            switch (e.LogLevel)
+            {
+                case LogLevel.Warn:
+                    logger.Warn(e.LogMessage);
+                    break;
+
+                case LogLevel.Error:
+                    logger.Error(e.LogMessage);
+                    break;
+
+                case LogLevel.Debug:
+                    logger.Debug(e.LogMessage);
+                    break;
+
+                case LogLevel.Info:
+                    logger.Info(e.LogMessage);
+                    break;
             }
         }
     }

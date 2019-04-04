@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using FryProxy.Headers;
+using FryProxy.Logging;
 using FryProxy.Utils;
 using FryProxy.Writers;
 
@@ -94,13 +95,11 @@ namespace FryProxy
             sslServerStream.AuthenticateAsClient(context.ServerEndPoint.Host, null, _enabledProtocols, false);
             context.ServerStream = sslServerStream;
 
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("SSL Connection Established: {0}:{1}",
-                    context.ServerEndPoint.Host,
-                    context.ServerEndPoint.Port
-                );
-            }
+            this.OnLog(LogLevel.Debug,
+                "SSL Connection Established: {0}:{1}",
+                context.ServerEndPoint.Host,
+                context.ServerEndPoint.Port
+            );
         }
 
         /// <summary>
@@ -147,11 +146,11 @@ namespace FryProxy
             {
                 if (ex.IsSocketException(SocketError.ConnectionReset, SocketError.ConnectionAborted))
                 {
-                    Logger.WarnFormat("Request Aborted. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
+                    this.OnLog(LogLevel.Warn, "Request Aborted. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
                 }
                 else if(ex.IsSocketException(SocketError.TimedOut))
                 {
-                    Logger.WarnFormat("Client request time out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
+                    this.OnLog(LogLevel.Warn, "Client request time out. {0}", TraceUtils.GetHttpTrace(context.RequestHeader));
                 }
                 else
                 {

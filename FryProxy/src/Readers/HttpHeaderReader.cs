@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using FryProxy.Headers;
-using log4net;
+using FryProxy.Logging;
 
 namespace FryProxy.Readers
 {
@@ -12,9 +12,6 @@ namespace FryProxy.Readers
     /// </summary>
     public class HttpHeaderReader
     {
-
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (HttpHeaderReader));
-
         private readonly TextReader _reader;
 
         /// <summary>
@@ -25,6 +22,8 @@ namespace FryProxy.Readers
         {
             _reader = reader;
         }
+
+        public event EventHandler<LogEventArgs> Log;
 
         /// <summary>
         ///     Read next not empty line.
@@ -58,7 +57,7 @@ namespace FryProxy.Readers
             }
             catch
             {
-                Logger.ErrorFormat("Wrong chunk size: {0}", firstLine);
+                this.OnLog(LogLevel.Error, "Wrong chunk size: {0}", firstLine);
                 
                 throw;
             }
@@ -94,5 +93,13 @@ namespace FryProxy.Readers
             };
         }
 
+        protected void OnLog(LogLevel level, string template, params object[] args)
+        {
+            if (this.Log != null)
+            {
+                LogEventArgs e = new LogEventArgs(typeof(HttpProxy), level, template, args);
+                this.Log(this, e);
+            }
+        }
     }
 }

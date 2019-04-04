@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using FryProxy.Headers;
+using FryProxy.Logging;
 using FryProxy.Readers;
 using FryProxy.Utils;
-using log4net;
 
 namespace FryProxy.Writers
 {
@@ -15,8 +15,6 @@ namespace FryProxy.Writers
     /// </summary>
     public class HttpMessageWriter
     {
-        protected static readonly ILog Logger = LogManager.GetLogger(typeof (HttpMessageWriter));
-
         protected const Int32 BufferSize = 8192;
 
         protected readonly Stream OutputStream;
@@ -34,6 +32,8 @@ namespace FryProxy.Writers
 
             OutputStream = outputStream;
         }
+
+        public event EventHandler<LogEventArgs> Log;
 
         /// <summary>
         ///     Writes HTTP message to wrapped stream
@@ -92,10 +92,7 @@ namespace FryProxy.Writers
             }
             else
             {
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.Debug("Message body is empty");
-                }
+                OnLog(LogLevel.Debug, "Message body is empty");
                 return false;
             }
             return true;
@@ -140,6 +137,15 @@ namespace FryProxy.Writers
 
             writer.WriteLine("0");
             writer.Flush();
+        }
+
+        protected void OnLog(LogLevel level, string template, params object[] args)
+        {
+            if (this.Log != null)
+            {
+                LogEventArgs e = new LogEventArgs(typeof(HttpProxy), level, template, args);
+                this.Log(this, e);
+            }
         }
     }
 }

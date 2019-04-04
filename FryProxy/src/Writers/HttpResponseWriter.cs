@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FryProxy.Headers;
+using FryProxy.Logging;
 
 namespace FryProxy.Writers
 {
@@ -27,10 +28,7 @@ namespace FryProxy.Writers
             }
             else
             {
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.Debug("Skipping redirect response body");       
-                }
+                this.OnLog(LogLevel.Debug, "Skipping redirect response body");       
                 return false;
             }
         }
