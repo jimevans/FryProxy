@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Text;
+using FryProxy.Utils;
 
 namespace FryProxy.Headers {
 
@@ -14,8 +14,8 @@ namespace FryProxy.Headers {
 
         public HttpMessageHeader(String startLine, HttpHeaders headers)
         {
-            Contract.Requires<ArgumentNullException>(!String.IsNullOrEmpty(startLine), "startLine");
-            Contract.Requires<ArgumentNullException>(headers != null, "headers");
+            ContractUtils.Requires<ArgumentNullException>(!String.IsNullOrEmpty(startLine), "startLine");
+            ContractUtils.Requires<ArgumentNullException>(headers != null, "headers");
 
             _startLine = startLine;
             _httpHeaders = headers;

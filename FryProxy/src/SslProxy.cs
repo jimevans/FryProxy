@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -46,7 +45,7 @@ namespace FryProxy
             SslProtocols enabledProtocols = SslProtocols.Tls12
         ) : base(defaultPort)
         {
-            Contract.Requires<ArgumentNullException>(certificate != null, "certificate");
+            ContractUtils.Requires<ArgumentNullException>(certificate != null, "certificate");
 
             _certificateValidationCallback = rcValidationCallback ?? DefaultCertificateValidationCallback;
             _certificate = certificate;

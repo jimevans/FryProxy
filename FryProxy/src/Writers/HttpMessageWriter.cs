@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using FryProxy.Headers;
@@ -43,7 +41,7 @@ namespace FryProxy.Writers
         /// <param name="bodyLength">expected length of HTTP message body</param>
         public void Write(HttpMessageHeader header, Stream body = null, Nullable<Int64> bodyLength = null)
         {
-            Contract.Requires<ArgumentNullException>(header != null, "header");
+            ContractUtils.Requires<ArgumentNullException>(header != null, "header");
 
             var writer = new StreamWriter(OutputStream, Encoding.ASCII);
 

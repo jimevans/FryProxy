@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+using FryProxy.Utils;
 
 namespace FryProxy {
 
@@ -8,7 +8,7 @@ namespace FryProxy {
         private readonly IDictionary<ProcessingStage, Action<ProcessingContext>> _processingActions;
 
         public ProcessingPipeline(IDictionary<ProcessingStage, Action<ProcessingContext>> processingActions) {
-            Contract.Requires<ArgumentNullException>(processingActions != null, "processingActions");
+            ContractUtils.Requires<ArgumentNullException>(processingActions != null, "processingActions");
 
             _processingActions = processingActions;
         }

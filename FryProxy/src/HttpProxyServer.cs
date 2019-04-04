@@ -1,10 +1,10 @@
-﻿using FryProxy.Logging;
-using System;
-using System.Diagnostics.Contracts;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using FryProxy.Logging;
+using FryProxy.Utils;
 
 namespace FryProxy {
 
@@ -44,8 +44,8 @@ namespace FryProxy {
         /// <param name="proxyEndPoint">local endpoint to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
         public HttpProxyServer(IPEndPoint proxyEndPoint, HttpProxy httpProxy) {
-            Contract.Requires<ArgumentNullException>(proxyEndPoint != null, "proxyEndPoint");
-            Contract.Requires<ArgumentNullException>(httpProxy != null, "httpProxy");
+            ContractUtils.Requires<ArgumentNullException>(proxyEndPoint != null, "proxyEndPoint");
+            ContractUtils.Requires<ArgumentNullException>(httpProxy != null, "httpProxy");
 
             _worker = new HttpProxyWorker(proxyEndPoint, httpProxy);
             _worker.Log += this.OnComponentLog;
@@ -75,7 +75,7 @@ namespace FryProxy {
         public event EventHandler<LogEventArgs> Log;
 
         private static IPEndPoint ToIPEndPoint(DnsEndPoint proxyEndPoint) {
-            Contract.Requires<ArgumentNullException>(proxyEndPoint != null, "proxyEndPoint");
+            ContractUtils.Requires<ArgumentNullException>(proxyEndPoint != null, "proxyEndPoint");
 
             var ipAddress = Dns.GetHostAddresses(proxyEndPoint.Host)
                 .First(address => address.AddressFamily == AddressFamily.InterNetwork);

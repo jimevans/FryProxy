@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
@@ -22,7 +21,7 @@ namespace FryProxy.Utils
         /// <returns>request destination endpoint</returns>
         public static DnsEndPoint ResolveRequestEndpoint(HttpRequestHeader header, Int32 defaultPort)
         {
-            Contract.Requires<ArgumentNullException>(header != null, "header");
+            ContractUtils.Requires<ArgumentNullException>(header != null, "header");
 
             string hostFromHeaders = header.Host;
 
@@ -57,8 +56,8 @@ namespace FryProxy.Utils
         /// <returns>request destination endpoint</returns>
         public static DnsEndPoint ResolveEndpointFromHostHeader(String host, Int32 defaultPort)
         {
-            Contract.Requires<ArgumentNullException>(!String.IsNullOrWhiteSpace(host), "host");
-            Contract.Requires<ArgumentOutOfRangeException>(
+            ContractUtils.Requires<ArgumentNullException>(!String.IsNullOrWhiteSpace(host), "host");
+            ContractUtils.Requires<ArgumentOutOfRangeException>(
                 defaultPort > IPEndPoint.MinPort && defaultPort < IPEndPoint.MaxPort, "defaultPort");
 
             Match hostAndPortMatch = HostAndPortRegex.Match(host);

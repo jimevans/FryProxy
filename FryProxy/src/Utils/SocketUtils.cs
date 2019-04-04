@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net.Sockets;
 
@@ -9,7 +8,7 @@ namespace FryProxy.Utils
     static public class SocketUtils
     {
         public static Boolean IsSocketException(this Exception exception, params SocketError[] errorCodes) {
-            Contract.Requires<ArgumentNullException>(exception != null);
+            ContractUtils.Requires<ArgumentNullException>(exception != null, "exception");
 
             var errorCodeList = errorCodes == null 
                 ? new List<SocketError>() 

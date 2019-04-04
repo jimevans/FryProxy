@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using FryProxy.Logging;
+using FryProxy.Utils;
 
 namespace FryProxy
 {
@@ -49,7 +49,7 @@ namespace FryProxy
 
         public void Start(EventWaitHandle startEventHandle)
         {
-            Contract.Requires<ArgumentNullException>(startEventHandle != null, "startEventHandle");
+            ContractUtils.Requires<ArgumentNullException>(startEventHandle != null, "startEventHandle");
 
             if (!Active)
             {

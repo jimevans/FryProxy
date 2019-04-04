@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -161,7 +160,7 @@ namespace FryProxy
         /// <param name="clientSocket">Socket opened by the client</param>
         public void HandleClient(Socket clientSocket)
         {
-            Contract.Requires<ArgumentNullException>(clientSocket != null, "clientSocket");
+            ContractUtils.Requires<ArgumentNullException>(clientSocket != null, "clientSocket");
 
             var context = new ProcessingContext
             {
@@ -205,8 +204,8 @@ namespace FryProxy
         /// <param name="context">current request context</param>
         protected virtual void ReceiveRequest(ProcessingContext context)
         {
-            Contract.Requires<ArgumentNullException>(context != null, "context");
-            Contract.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
+            ContractUtils.Requires<ArgumentNullException>(context != null, "context");
+            ContractUtils.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
 
             var headerReader = new HttpHeaderReader(new PlainStreamReader(context.ClientStream));
             headerReader.Log += this.OnComponentLog;
@@ -255,8 +254,8 @@ namespace FryProxy
         /// <param name="context">current request context</param>
         protected virtual void ConnectToServer(ProcessingContext context)
         {
-            Contract.Requires<ArgumentNullException>(context != null, "context");
-            Contract.Requires<InvalidContextException>(context.RequestHeader != null, "RequestHeader");
+            ContractUtils.Requires<ArgumentNullException>(context != null, "context");
+            ContractUtils.Requires<InvalidContextException>(context.RequestHeader != null, "RequestHeader");
 
             context.ServerEndPoint = DnsUtils.ResolveRequestEndpoint(context.RequestHeader, _defaultPort);
 
@@ -287,11 +286,11 @@ namespace FryProxy
         /// <param name="context">current request context</param>
         protected virtual void ReceiveResponse(ProcessingContext context)
         {
-            Contract.Requires<ArgumentNullException>(context != null, "context");
-            Contract.Requires<InvalidContextException>(context.ServerStream != null, "ServerStream");
-            Contract.Requires<InvalidContextException>(context.RequestHeader != null, "RequestHeader");
-            Contract.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
-            Contract.Requires<InvalidContextException>(context.ClientSocket != null, "ClientSocket");
+            ContractUtils.Requires<ArgumentNullException>(context != null, "context");
+            ContractUtils.Requires<InvalidContextException>(context.ServerStream != null, "ServerStream");
+            ContractUtils.Requires<InvalidContextException>(context.RequestHeader != null, "RequestHeader");
+            ContractUtils.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
+            ContractUtils.Requires<InvalidContextException>(context.ClientSocket != null, "ClientSocket");
 
             var requestWriter = new HttpMessageWriter(context.ServerStream);
             requestWriter.Log += this.OnComponentLog;
@@ -335,11 +334,11 @@ namespace FryProxy
         /// <param name="context">current request context</param>
         protected virtual void SendResponse(ProcessingContext context)
         {
-            Contract.Requires<ArgumentNullException>(context != null, "context");
-            Contract.Requires<InvalidContextException>(context.ServerStream != null, "ServerStream");
-            Contract.Requires<InvalidContextException>(context.ResponseHeader != null, "ResponseHeader");
-            Contract.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
-            Contract.Requires<InvalidContextException>(context.ServerSocket != null, "ServerSocket");
+            ContractUtils.Requires<ArgumentNullException>(context != null, "context");
+            ContractUtils.Requires<InvalidContextException>(context.ServerStream != null, "ServerStream");
+            ContractUtils.Requires<InvalidContextException>(context.ResponseHeader != null, "ResponseHeader");
+            ContractUtils.Requires<InvalidContextException>(context.ClientStream != null, "ClientStream");
+            ContractUtils.Requires<InvalidContextException>(context.ServerSocket != null, "ServerSocket");
 
             var responseWriter = new HttpResponseWriter(context.ClientStream);
 
@@ -378,7 +377,7 @@ namespace FryProxy
         /// <param name="context"></param>
         protected virtual void CompleteProcessing(ProcessingContext context)
         {
-            Contract.Requires<ArgumentNullException>(context != null, "context");
+            ContractUtils.Requires<ArgumentNullException>(context != null, "context");
 
             if (context.ClientStream != null)
             {
