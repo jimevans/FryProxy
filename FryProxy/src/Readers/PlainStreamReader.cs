@@ -5,7 +5,7 @@ namespace FryProxy.Utils {
 
     internal class PlainStreamReader : TextReader {
 
-        private const Int32 EmptyBuffer = Int32.MinValue;
+        private const int EmptyBuffer = int.MinValue;
         private int _lastPeek = EmptyBuffer;
         private int _lastRead = EmptyBuffer;
         private readonly Stream _stream;
@@ -14,7 +14,7 @@ namespace FryProxy.Utils {
             _stream = stream;
         }
 
-        public Boolean EndOfStream {
+        public bool EndOfStream {
             get { return _lastRead == -1; }
         }
 

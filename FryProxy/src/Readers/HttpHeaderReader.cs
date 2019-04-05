@@ -31,11 +31,11 @@ namespace FryProxy.Readers
         ///     Also can be used for reading chunk length of chunked message body.
         /// </summary>
         /// <returns>firts not empty line</returns>
-        public String ReadFirstLine()
+        public string ReadFirstLine()
         {
-            var firstLine = String.Empty;
+            var firstLine = string.Empty;
 
-            while (String.IsNullOrWhiteSpace(firstLine))
+            while (string.IsNullOrWhiteSpace(firstLine))
             {
                 firstLine = _reader.ReadLine();
             }
@@ -47,13 +47,13 @@ namespace FryProxy.Readers
         ///     Read size of next chunked HTTP message part
         /// </summary>
         /// <returns>next chunk size</returns>
-        public Int32 ReadNextChunkSize()
+        public int ReadNextChunkSize()
         {
             var firstLine = ReadFirstLine();
 
             try
             {
-                return Int32.Parse(firstLine, NumberStyles.HexNumber);
+                return int.Parse(firstLine, NumberStyles.HexNumber);
             }
             catch
             {
@@ -67,12 +67,12 @@ namespace FryProxy.Readers
         ///     Read HTTP headers from underlying <see cref="TextReader"/>
         /// </summary>
         /// <returns>raw header lines</returns>
-        public IList<String> ReadHeaders()
+        public IList<string> ReadHeaders()
         {
-            var headers = new List<String>();
+            var headers = new List<string>();
 
             for (var nextLine = _reader.ReadLine();
-                !String.IsNullOrEmpty(nextLine);
+                !string.IsNullOrEmpty(nextLine);
                 nextLine = _reader.ReadLine())
             {
                 headers.Add(nextLine);

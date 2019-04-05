@@ -4,19 +4,19 @@ namespace FryProxy.Headers {
 
     public sealed class EntityHeaders {
 
-        public const String AllowHeader = "Allow";
+        public const string AllowHeader = "Allow";
 
-        public const String ExpiresHeader = "Expires";
+        public const string ExpiresHeader = "Expires";
 
-        public const String LastModifiedHeader = "Last-Modified";
+        public const string LastModifiedHeader = "Last-Modified";
 
-        public const String ContentMD5Header = "Content-MD5";
-        public const String ContentTypeHeader = "Content-Type";
-        public const String ContentRangeHeader = "Content-Range";
-        public const String ContentLengthHeader = "Content-Length";
-        public const String ContentLanguageHeader = "Content-Language";
-        public const String ContentLocationHeader = "Content-Location";
-        public const String ContentEncodingHeader = "Content-Encoding";
+        public const string ContentMD5Header = "Content-MD5";
+        public const string ContentTypeHeader = "Content-Type";
+        public const string ContentRangeHeader = "Content-Range";
+        public const string ContentLengthHeader = "Content-Length";
+        public const string ContentLanguageHeader = "Content-Language";
+        public const string ContentLocationHeader = "Content-Location";
+        public const string ContentEncodingHeader = "Content-Encoding";
 
         private readonly HttpHeaders _headers;
 
@@ -24,42 +24,42 @@ namespace FryProxy.Headers {
             _headers = headers;
         }
 
-        public String Allow {
+        public string Allow {
             get { return _headers[AllowHeader]; }
             set { _headers[AllowHeader] = value; }
         }
 
-        public String Expires {
+        public string Expires {
             get { return _headers[ExpiresHeader]; }
             set { _headers[ExpiresHeader] = value; }
         }
 
-        public String LastModified {
+        public string LastModified {
             get { return _headers[LastModifiedHeader]; }
             set { _headers[LastModifiedHeader] = value; }
         }
 
-        public String ContentMD5 {
+        public string ContentMD5 {
             get { return _headers[ContentMD5Header]; }
             set { _headers[ContentMD5Header] = value; }
         }
 
-        public String ContentType {
+        public string ContentType {
             get { return _headers[ContentTypeHeader]; }
             set { _headers[ContentTypeHeader] = value; }
         }
 
-        public String ContentRange {
+        public string ContentRange {
             get { return _headers[ContentRangeHeader]; }
             set { _headers[ContentRangeHeader] = value; }
         }
 
-        public Int64? ContentLength {
+        public long? ContentLength {
             get {
                 var contentLength = _headers[ContentLengthHeader];
 
                 if (contentLength != null) {
-                    return Int64.Parse(contentLength);
+                    return long.Parse(contentLength);
                 }
 
                 return null;
@@ -67,17 +67,17 @@ namespace FryProxy.Headers {
             set { _headers[ContentLengthHeader] = value.HasValue ? value.Value.ToString() : null; }
         }
 
-        public String ContentLanguage {
+        public string ContentLanguage {
             get { return _headers[ContentLanguageHeader]; }
             set { _headers[ContentLanguageHeader] = value; }
         }
 
-        public String ContentLocation {
+        public string ContentLocation {
             get { return _headers[ContentLocationHeader]; }
             set { _headers[ContentLocationHeader] = value; }
         }
 
-        public String ContentEncoding {
+        public string ContentEncoding {
             get { return _headers[ContentEncodingHeader]; }
             set { _headers[ContentEncodingHeader] = value; }
         }

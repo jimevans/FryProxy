@@ -17,7 +17,7 @@ namespace FryProxy
     /// </summary>
     public class SslProxy : HttpProxy
     {
-        private const Int32 DefaultSecureHttpPort = 443;
+        private const int DefaultSecureHttpPort = 443;
 
         private static readonly RemoteCertificateValidationCallback DefaultCertificateValidationCallback =
             (sender, certificate, chain, errors) => true;
@@ -40,7 +40,7 @@ namespace FryProxy
         /// <param name="rcValidationCallback">
         ///     Used to validate destination server certificate. By default it accepts anything provided by server
         /// </param>
-        public SslProxy(X509Certificate certificate, Int32 defaultPort,
+        public SslProxy(X509Certificate certificate, int defaultPort,
             RemoteCertificateValidationCallback rcValidationCallback = null,
             SslProtocols enabledProtocols = SslProtocols.Tls12
         ) : base(defaultPort)

@@ -9,23 +9,23 @@ namespace FryProxy.Headers
     /// </summary>
     public class HttpHeaders
     {
-        private const String HeaderValueSeparator = ",";
+        private const string HeaderValueSeparator = ",";
 
-        private const Char HeaderNameSeparator = ':';
+        private const char HeaderNameSeparator = ':';
 
-        private static readonly Char[] HeaderNameSeparatorArray =
+        private static readonly char[] HeaderNameSeparatorArray =
         {
             HeaderNameSeparator
         };
 
-        private readonly List<KeyValuePair<String, String>> _headers;
+        private readonly List<KeyValuePair<string, string>> _headers;
 
         /// <summary>
         ///     Create new instance of HTTP header collection
         /// </summary>
         public HttpHeaders()
         {
-            _headers = new List<KeyValuePair<String, String>>();
+            _headers = new List<KeyValuePair<string, string>>();
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace FryProxy.Headers
         /// <param name="headers">
         ///     HTTP message headers as {name} : {value} strings
         /// </param>
-        public HttpHeaders(IEnumerable<String> headers) : this()
+        public HttpHeaders(IEnumerable<string> headers) : this()
         {
             if (headers == null)
             {
@@ -52,18 +52,18 @@ namespace FryProxy.Headers
         /// </summary>
         /// <param name="name">header name</param>
         /// <returns>header value</returns>
-        public String this[String name]
+        public string this[string name]
         {
             get
             {
                 return Contains(name)
-                    ? String.Join(HeaderValueSeparator, _headers.Where(h => h.Key == name).Select(h => h.Value))
+                    ? string.Join(HeaderValueSeparator, _headers.Where(h => h.Key == name).Select(h => h.Value))
                     : null;
             }
 
             set
             {
-                var newHeader = new KeyValuePair<String, String>(name, value);
+                var newHeader = new KeyValuePair<string, string>(name, value);
 
                 int existingHeaderIndex = _headers.FindIndex(h => h.Key == name);
 
@@ -78,17 +78,17 @@ namespace FryProxy.Headers
             }
         }
 
-        public IEnumerable<KeyValuePair<String, String>> Pairs
+        public IEnumerable<KeyValuePair<string, string>> Pairs
         {
             get { return _headers.AsReadOnly(); }
         }
 
-        public IEnumerable<String> Lines
+        public IEnumerable<string> Lines
         {
             get { return _headers.Select(FormatHeader); }
         }
 
-        private static KeyValuePair<String, String> ParseHeaderLine(String headerLine)
+        private static KeyValuePair<string, string> ParseHeaderLine(string headerLine)
         {
             if (string.IsNullOrEmpty(headerLine))
             {
@@ -97,52 +97,52 @@ namespace FryProxy.Headers
 
             string[] header = headerLine.Split(HeaderNameSeparatorArray, 2, StringSplitOptions.None);
 
-            if (header.Length < 2 || String.IsNullOrWhiteSpace(header[0]))
+            if (header.Length < 2 || string.IsNullOrWhiteSpace(header[0]))
             {
-                throw new ArgumentException(String.Format("Invalid header: [{0}]", headerLine), "headerLine");
+                throw new ArgumentException(string.Format("Invalid header: [{0}]", headerLine), "headerLine");
             }
 
-            return new KeyValuePair<String, String>(header[0].Trim(), header[1].Trim());
+            return new KeyValuePair<string, string>(header[0].Trim(), header[1].Trim());
         }
 
-        private static String FormatHeader(KeyValuePair<String, String> header)
+        private static string FormatHeader(KeyValuePair<string, string> header)
         {
             return header.Key + HeaderNameSeparator + header.Value;
         }
 
-        public void Add(KeyValuePair<String, String> header)
+        public void Add(KeyValuePair<string, string> header)
         {
             _headers.Add(header);
         }
 
-        public void Add(String name, String value)
+        public void Add(string name, string value)
         {
-            Add(new KeyValuePair<String, String>(name, value));
+            Add(new KeyValuePair<string, string>(name, value));
         }
 
-        public Boolean Remove(String key)
+        public bool Remove(string key)
         {
             return _headers.Remove(_headers.Find(h => h.Key == key));
         }
 
-        public Int32 RemoveAll(String name)
+        public int RemoveAll(string name)
         {
             return _headers.RemoveAll(h => h.Key == name);
         }
 
-        public Boolean Remove(KeyValuePair<String, String> header)
+        public bool Remove(KeyValuePair<string, string> header)
         {
             return _headers.Remove(header);
         }
 
-        public Boolean Contains(String key)
+        public bool Contains(string key)
         {
             return _headers.Any(h => h.Key == key);
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-            return String.Join("\n", Lines);
+            return string.Join("\n", Lines);
         }
     }
 }

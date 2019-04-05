@@ -10,7 +10,7 @@ namespace FryProxy.Writers
     /// </summary>
     public class HttpResponseWriter : HttpMessageWriter
     {
-        private const String DefaultHttpVersion = "1.1";
+        private const string DefaultHttpVersion = "1.1";
 
         /// <summary>
         ///     Creates new writer instance, writing to provided stream
@@ -20,7 +20,7 @@ namespace FryProxy.Writers
         {
         }
 
-        protected override bool WriteBody(HttpMessageHeader header, Stream body, Int64 bodyLength)
+        protected override bool WriteBody(HttpMessageHeader header, Stream body, long bodyLength)
         {
             if (!IsRedirect(header as HttpResponseHeader))
             {
@@ -33,11 +33,11 @@ namespace FryProxy.Writers
             }
         }
 
-        private static Boolean IsRedirect(HttpResponseHeader header)
+        private static bool IsRedirect(HttpResponseHeader header)
         {
             return header != null 
                 && (header.StatusCode >= 300 || header.StatusCode < 400) 
-                && !String.IsNullOrEmpty(header.Location);
+                && !string.IsNullOrEmpty(header.Location);
         }
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace FryProxy.Writers
         /// <param name="reason">response status message</param>
         /// <param name="httpVersion">HTTP protocol version</param>
         /// <param name="body">response body</param>
-        public void Write(Int32 statusCode, String reason = null, String httpVersion = null, Stream body = null)
+        public void Write(int statusCode, string reason = null, string httpVersion = null, Stream body = null)
         {
-            Write(new HttpResponseHeader(statusCode, reason ?? String.Empty, httpVersion ?? DefaultHttpVersion), body);
+            Write(new HttpResponseHeader(statusCode, reason ?? string.Empty, httpVersion ?? DefaultHttpVersion), body);
         }
 
         /// <summary>

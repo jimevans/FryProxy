@@ -6,32 +6,32 @@ namespace FryProxy.Headers {
 
     public class HttpRequestHeader : HttpMessageHeader {
 
-        public const String TEHeader = "TE";
+        public const string TEHeader = "TE";
 
-        public const String RangeHeader = "Range";
+        public const string RangeHeader = "Range";
 
-        public const String FromHeader = "From";
-        public const String HostHeader = "Host";
-        public const String RefererHeader = "Referer";
-        public const String ExpectHeader = "Expect";
+        public const string FromHeader = "From";
+        public const string HostHeader = "Host";
+        public const string RefererHeader = "Referer";
+        public const string ExpectHeader = "Expect";
 
-        public const String UserAgentHeader = "User-Agent";
+        public const string UserAgentHeader = "User-Agent";
 
-        public const String MaxForwardsHeader = "Max-Forwards";
+        public const string MaxForwardsHeader = "Max-Forwards";
 
-        public const String AuthorizationHeader = "Authorization";
-        public const String ProxyAuthorizationHeader = "Proxy-Authorization";
+        public const string AuthorizationHeader = "Authorization";
+        public const string ProxyAuthorizationHeader = "Proxy-Authorization";
 
-        public const String AcceptHeader = "Accept";
-        public const String AcceptCharsetHeader = "Accept-Charset";
-        public const String AcceptEncodingHeader = "Accept-Encoding";
-        public const String AcceptLanguageHeader = "Accept-Language";
+        public const string AcceptHeader = "Accept";
+        public const string AcceptCharsetHeader = "Accept-Charset";
+        public const string AcceptEncodingHeader = "Accept-Encoding";
+        public const string AcceptLanguageHeader = "Accept-Language";
 
-        public const String IfMatchHeader = "If-Match";
-        public const String IfRangeHeader = "If-Range";
-        public const String IfNoneMatchHeader = "If-None-Match";
-        public const String IfModifiedSinceHeader = "If-Modified-Since";
-        public const String IfUnmodifiedSinceHeader = "If-Unmodified-Since";
+        public const string IfMatchHeader = "If-Match";
+        public const string IfRangeHeader = "If-Range";
+        public const string IfNoneMatchHeader = "If-None-Match";
+        public const string IfModifiedSinceHeader = "If-Modified-Since";
+        public const string IfUnmodifiedSinceHeader = "If-Unmodified-Since";
 
         private static readonly Regex RequestLineRegex = new Regex(
             @"(?<method>\w+)\s(?<uri>.+)\sHTTP/(?<version>\d\.\d)", RegexOptions.Compiled
@@ -47,7 +47,7 @@ namespace FryProxy.Headers {
             StartLine = header.StartLine;
         }
 
-        public HttpRequestHeader(String startLine = null) : base(startLine) {
+        public HttpRequestHeader(string startLine = null) : base(startLine) {
             StartLine = base.StartLine;
         }
 
@@ -61,7 +61,7 @@ namespace FryProxy.Headers {
                     return methodType;
                 }
 
-                throw new InvalidOperationException(String.Format("Unknown method type: [{0}]", rawHttpMethod));
+                throw new InvalidOperationException(string.Format("Unknown method type: [{0}]", rawHttpMethod));
             }
 
             set {
@@ -72,17 +72,17 @@ namespace FryProxy.Headers {
         /// <summary>
         ///     Request method
         /// </summary>
-        public String Method { get; set; }
+        public string Method { get; set; }
 
         /// <summary>
         ///     Request path
         /// </summary>
-        public String RequestURI { get; set; }
+        public string RequestURI { get; set; }
 
         /// <summary>
         ///     HTTP protocol version
         /// </summary>
-        public String Version { get; set; }
+        public string Version { get; set; }
 
         /// <summary>
         ///     First line of HTTP response message
@@ -90,8 +90,8 @@ namespace FryProxy.Headers {
         /// <exception cref="ArgumentException">
         ///     If Request-Line is invalid
         /// </exception>
-        public override sealed String StartLine {
-            get { return String.Format("{0} {1} HTTP/{2}", Method, RequestURI, Version); }
+        public override sealed string StartLine {
+            get { return string.Format("{0} {1} HTTP/{2}", Method, RequestURI, Version); }
 
             set {
                 var match = RequestLineRegex.Match(value);
@@ -119,7 +119,7 @@ namespace FryProxy.Headers {
         /// <summary>
         ///     Host header value
         /// </summary>
-        public String Host {
+        public string Host {
             get { return Headers[HostHeader]; }
             set { Headers[HostHeader] = value; }
         }
@@ -127,92 +127,92 @@ namespace FryProxy.Headers {
         /// <summary>
         ///     Referer header value
         /// </summary>
-        public String Referer {
+        public string Referer {
             get { return Headers[RefererHeader]; }
             set { Headers[RefererHeader] = value; }
         }
 
-        public String TE {
+        public string TE {
             get { return Headers[TEHeader]; }
             set { Headers[TEHeader] = value; }
         }
 
-        public String Range {
+        public string Range {
             get { return Headers[RangeHeader]; }
             set { Headers[RangeHeader] = value; }
         }
 
-        public String From {
+        public string From {
             get { return Headers[FromHeader]; }
             set { Headers[FromHeader] = value; }
         }
 
-        public String Expect {
+        public string Expect {
             get { return Headers[ExpectHeader]; }
             set { Headers[ExpectHeader] = value; }
         }
 
-        public String UserAgent {
+        public string UserAgent {
             get { return Headers[UserAgentHeader]; }
             set { Headers[UserAgentHeader] = value; }
         }
 
-        public String MaxForwards {
+        public string MaxForwards {
             get { return Headers[MaxForwardsHeader]; }
             set { Headers[MaxForwardsHeader] = value; }
         }
 
-        public String Authorization {
+        public string Authorization {
             get { return Headers[AuthorizationHeader]; }
             set { Headers[AuthorizationHeader] = value; }
         }
 
-        public String ProxyAuthorization {
+        public string ProxyAuthorization {
             get { return Headers[ProxyAuthorizationHeader]; }
             set { Headers[ProxyAuthorizationHeader] = value; }
         }
 
-        public String Accept {
+        public string Accept {
             get { return Headers[AcceptHeader]; }
             set { Headers[AcceptHeader] = value; }
         }
 
-        public String AcceptCharset {
+        public string AcceptCharset {
             get { return Headers[AcceptCharsetHeader]; }
             set { Headers[AcceptCharsetHeader] = value; }
         }
 
-        public String AcceptEncoding {
+        public string AcceptEncoding {
             get { return Headers[AcceptEncodingHeader]; }
             set { Headers[AcceptEncodingHeader] = value; }
         }
 
-        public String AcceptLanguage {
+        public string AcceptLanguage {
             get { return Headers[AcceptLanguageHeader]; }
             set { Headers[AcceptLanguageHeader] = value; }
         }
 
-        public String IfMatch {
+        public string IfMatch {
             get { return Headers[IfMatchHeader]; }
             set { Headers[IfMatchHeader] = value; }
         }
 
-        public String IfRange {
+        public string IfRange {
             get { return Headers[IfRangeHeader]; }
             set { Headers[IfRangeHeader] = value; }
         }
 
-        public String IfNoneMatch {
+        public string IfNoneMatch {
             get { return Headers[IfNoneMatchHeader]; }
             set { Headers[IfNoneMatchHeader] = value; }
         }
 
-        public String IfModifiedSince {
+        public string IfModifiedSince {
             get { return Headers[IfModifiedSinceHeader]; }
             set { Headers[IfModifiedSinceHeader] = value; }
         }
 
-        public String IfUnmodifiedSince {
+        public string IfUnmodifiedSince {
             get { return Headers[IfUnmodifiedSinceHeader]; }
             set { Headers[IfUnmodifiedSinceHeader] = value; }
         }

@@ -19,13 +19,13 @@ namespace FryProxy.Utils
         /// <param name="header">request header to use</param>
         /// <param name="defaultPort">which port to use if none is present in host header</param>
         /// <returns>request destination endpoint</returns>
-        public static DnsEndPoint ResolveRequestEndpoint(HttpRequestHeader header, Int32 defaultPort)
+        public static DnsEndPoint ResolveRequestEndpoint(HttpRequestHeader header, int defaultPort)
         {
             ContractUtils.Requires<ArgumentNullException>(header != null, "header");
 
             string hostFromHeaders = header.Host;
 
-            return !String.IsNullOrEmpty(hostFromHeaders)
+            return !string.IsNullOrEmpty(hostFromHeaders)
                 ? ResolveEndpointFromHostHeader(hostFromHeaders, defaultPort)
                 : ResolveEndpointFromURI(header.RequestURI);
         }
@@ -36,7 +36,7 @@ namespace FryProxy.Utils
         /// <param name="uri">request URI</param>
         /// <returns>request destination endpoint</returns>
         /// <exception cref="ArgumentException">thrown if provided string is not URI</exception>
-        public static DnsEndPoint ResolveEndpointFromURI(String uri)
+        public static DnsEndPoint ResolveEndpointFromURI(string uri)
         {
             Uri parsedUri;
 
@@ -45,7 +45,7 @@ namespace FryProxy.Utils
                 return new DnsEndPoint(parsedUri.Host, parsedUri.Port, AddressFamily.InterNetwork);
             }
 
-            throw new ArgumentException(String.Format("Cannot resolve endpoint from: {0}", uri), "uri");
+            throw new ArgumentException(string.Format("Cannot resolve endpoint from: {0}", uri), "uri");
         }
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace FryProxy.Utils
         /// <param name="host">host header value</param>
         /// <param name="defaultPort">port to use if one is absent in host header</param>
         /// <returns>request destination endpoint</returns>
-        public static DnsEndPoint ResolveEndpointFromHostHeader(String host, Int32 defaultPort)
+        public static DnsEndPoint ResolveEndpointFromHostHeader(string host, int defaultPort)
         {
-            ContractUtils.Requires<ArgumentNullException>(!String.IsNullOrWhiteSpace(host), "host");
+            ContractUtils.Requires<ArgumentNullException>(!string.IsNullOrWhiteSpace(host), "host");
             ContractUtils.Requires<ArgumentOutOfRangeException>(
                 defaultPort > IPEndPoint.MinPort && defaultPort < IPEndPoint.MaxPort, "defaultPort");
 
@@ -66,7 +66,7 @@ namespace FryProxy.Utils
             {
                 return new DnsEndPoint(
                     hostAndPortMatch.Groups["host"].Value,
-                    Int32.Parse(hostAndPortMatch.Groups["port"].Value),
+                    int.Parse(hostAndPortMatch.Groups["port"].Value),
                     AddressFamily.InterNetwork
                     );
             }

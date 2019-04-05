@@ -36,11 +36,11 @@ namespace FryProxy.Utils
             }
         }
 
-        public static String GetHttpTrace(HttpMessageHeader header)
+        public static string GetHttpTrace(HttpMessageHeader header)
         {
             if (header == null)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             var sb = new StringBuilder();

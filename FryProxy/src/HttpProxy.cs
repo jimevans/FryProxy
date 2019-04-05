@@ -19,11 +19,11 @@ namespace FryProxy
     /// </summary>
     public class HttpProxy
     {
-        protected const Int32 DefaultHttpPort = 80;
+        protected const int DefaultHttpPort = 80;
 
         private static readonly TimeSpan DefaultCommunicationTimeout = TimeSpan.FromSeconds(1);
 
-        private readonly Int32 _defaultPort;
+        private readonly int _defaultPort;
 
         private readonly ActionWrapper<ProcessingContext> _onProcessingCompleteWrapper =
             new ActionWrapper<ProcessingContext>();
@@ -55,7 +55,7 @@ namespace FryProxy
         /// <param name="defaultPort">
         ///     Port number on destination server which will be used if not specified in request
         /// </param>
-        public HttpProxy(Int32 defaultPort)
+        public HttpProxy(int defaultPort)
         {
             if (defaultPort < IPEndPoint.MinPort || defaultPort > IPEndPoint.MaxPort)
             {
@@ -167,8 +167,8 @@ namespace FryProxy
                 ClientSocket = clientSocket,
                 ClientStream = new NetworkStream(clientSocket, true)
                 {
-                    ReadTimeout = (Int32) ClientReadTimeout.TotalMilliseconds,
-                    WriteTimeout = (Int32) ClientWriteTimeout.TotalMilliseconds
+                    ReadTimeout = (int) ClientReadTimeout.TotalMilliseconds,
+                    WriteTimeout = (int) ClientWriteTimeout.TotalMilliseconds
                 }
             };
 
@@ -261,8 +261,8 @@ namespace FryProxy
 
             context.ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             {
-                ReceiveTimeout = (Int32) ServerReadTimeout.TotalMilliseconds,
-                SendTimeout = (Int32) ServerWriteTimeout.TotalMilliseconds
+                ReceiveTimeout = (int) ServerReadTimeout.TotalMilliseconds,
+                SendTimeout = (int) ServerWriteTimeout.TotalMilliseconds
             };
 
             context.ServerSocket.Connect(context.ServerEndPoint.Host, context.ServerEndPoint.Port);

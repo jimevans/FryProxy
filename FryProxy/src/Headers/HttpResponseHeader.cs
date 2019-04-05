@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
 
 namespace FryProxy.Headers {
 
     public class HttpResponseHeader : HttpMessageHeader {
 
-        public const String AgeHeader = "Age";
+        public const string AgeHeader = "Age";
 
-        public const String EtagHeader = "Etag";
+        public const string EtagHeader = "Etag";
 
-        public const String VaryHeader = "Vary";
+        public const string VaryHeader = "Vary";
 
-        public const String ServerHeader = "Server";
+        public const string ServerHeader = "Server";
 
-        public const String LocationHeader = "Location";
+        public const string LocationHeader = "Location";
 
-        public const String RetryAfterHeader = "Retry-After";
+        public const string RetryAfterHeader = "Retry-After";
 
-        public const String AcceptRangesHeader = "Accept-Ranges";
+        public const string AcceptRangesHeader = "Accept-Ranges";
 
-        public const String WWWAuthenticateHeader = "WWW-Authenticate";
-        public const String ProxyAuthenticateHeader = "Proxy-Authenticate";
+        public const string WWWAuthenticateHeader = "WWW-Authenticate";
+        public const string ProxyAuthenticateHeader = "Proxy-Authenticate";
 
         private static readonly Regex ResponseLineRegex = new Regex(
             @"HTTP/(?<version>\d\.\d)\s(?<status>\d{3})\s(?<reason>.*)", RegexOptions.Compiled
@@ -32,31 +31,31 @@ namespace FryProxy.Headers {
             StartLine = base.StartLine;
         }
 
-        public HttpResponseHeader(Int32 statusCode, String statusMessage, String version)
+        public HttpResponseHeader(int statusCode, string statusMessage, string version)
         {
             StatusCode = statusCode;
             Reason = statusMessage;
             Version = version;
         }
 
-        public HttpResponseHeader(String startLine) : base(startLine) {
+        public HttpResponseHeader(string startLine) : base(startLine) {
             StartLine = base.StartLine;
         }
 
         /// <summary>
         ///     HTTP response status code
         /// </summary>
-        public Int32 StatusCode { get; set; }
+        public int StatusCode { get; set; }
 
         /// <summary>
         ///     HTTP protocol version
         /// </summary>
-        public String Version { get; set; }
+        public string Version { get; set; }
 
         /// <summary>
         ///     HTTP respnse status message
         /// </summary>
-        public String Reason { get; set; }
+        public string Reason { get; set; }
 
         /// <summary>
         ///     First line of HTTP response message
@@ -64,8 +63,8 @@ namespace FryProxy.Headers {
         /// <exception cref="ArgumentException">
         ///     If Status-Line is invalid
         /// </exception>
-        public override sealed String StartLine {
-            get { return String.Format("HTTP/{0} {1} {2}", Version, StatusCode, Reason); }
+        public override sealed string StartLine {
+            get { return string.Format("HTTP/{0} {1} {2}", Version, StatusCode, Reason); }
 
             set {
                 var match = ResponseLineRegex.Match(value);
@@ -76,53 +75,53 @@ namespace FryProxy.Headers {
 
                 Reason = match.Groups["reason"].Value;
                 Version = match.Groups["version"].Value;
-                StatusCode = Int32.Parse(match.Groups["status"].Value);
+                StatusCode = int.Parse(match.Groups["status"].Value);
 
                 base.StartLine = value;
             }
         }
 
-        public String Age {
+        public string Age {
             get { return Headers[AgeHeader]; }
             set { Headers[AgeHeader] = value; }
         }
 
-        public String Etag {
+        public string Etag {
             get { return Headers[EtagHeader]; }
             set { Headers[EtagHeader] = value; }
         }
 
-        public String Vary {
+        public string Vary {
             get { return Headers[VaryHeader]; }
             set { Headers[VaryHeader] = value; }
         }
 
-        public String Server {
+        public string Server {
             get { return Headers[ServerHeader]; }
             set { Headers[ServerHeader] = value; }
         }
 
-        public String Location {
+        public string Location {
             get { return Headers[LocationHeader]; }
             set { Headers[LocationHeader] = value; }
         }
 
-        public String RetryAfter {
+        public string RetryAfter {
             get { return Headers[RetryAfterHeader]; }
             set { Headers[RetryAfterHeader] = value; }
         }
 
-        public String AcceptRanges {
+        public string AcceptRanges {
             get { return Headers[AcceptRangesHeader]; }
             set { Headers[AcceptRangesHeader] = value; }
         }
 
-        public String WWWAuthenticate {
+        public string WWWAuthenticate {
             get { return Headers[WWWAuthenticateHeader]; }
             set { Headers[WWWAuthenticateHeader] = value; }
         }
 
-        public String ProxyAuthenticate {
+        public string ProxyAuthenticate {
             get { return Headers[ProxyAuthenticateHeader]; }
             set { Headers[ProxyAuthenticateHeader] = value; }
         }

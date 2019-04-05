@@ -69,7 +69,7 @@ namespace FryProxy
         /// <summary>
         ///     Flag indicating that request was processed successfully or processing was interrupted.
         /// </summary>
-        public Boolean Processed
+        public bool Processed
         {
             get
             {

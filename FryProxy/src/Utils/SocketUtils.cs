@@ -7,7 +7,7 @@ namespace FryProxy.Utils
 {
     static public class SocketUtils
     {
-        public static Boolean IsSocketException(this Exception exception, params SocketError[] errorCodes) {
+        public static bool IsSocketException(this Exception exception, params SocketError[] errorCodes) {
             ContractUtils.Requires<ArgumentNullException>(exception != null, "exception");
 
             var errorCodeList = errorCodes == null 

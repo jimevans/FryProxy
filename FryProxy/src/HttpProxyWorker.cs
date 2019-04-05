@@ -15,7 +15,7 @@ namespace FryProxy
 
         private readonly ISet<Socket> _openSockets;
         private Thread _acceptSocketThread;
-        private Boolean _shuttingDown;
+        private bool _shuttingDown;
 
         public HttpProxyWorker(IPEndPoint proxyEndPoint, HttpProxy httpProxy)
             : this(new TcpListener(proxyEndPoint), httpProxy)
@@ -40,7 +40,7 @@ namespace FryProxy
             get { return _httpProxy; }
         }
 
-        public Boolean Active
+        public bool Active
         {
             get { return _listener.Server.IsBound; }
         }

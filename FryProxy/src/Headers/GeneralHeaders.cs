@@ -4,17 +4,17 @@ namespace FryProxy.Headers {
 
     public class GeneralHeaders {
 
-        public const String PragmaHeader = "Pragma";
+        public const string PragmaHeader = "Pragma";
 
-        public const String ConnectionHeader = "Connection";
+        public const string ConnectionHeader = "Connection";
 
-        public const String ProxyConnectionHeader = "Proxy-Connection";
+        public const string ProxyConnectionHeader = "Proxy-Connection";
 
-        public const String CacheControlHeader = "Cache-Control";
+        public const string CacheControlHeader = "Cache-Control";
 
-        public const String TransferEncodingHeader = "Transfer-Encoding";
+        public const string TransferEncodingHeader = "Transfer-Encoding";
 
-        public const String TrailerHeader = "Trailer";
+        public const string TrailerHeader = "Trailer";
 
         public readonly HttpHeaders Headers;
 
@@ -25,7 +25,7 @@ namespace FryProxy.Headers {
         /// <summary>
         ///     Cache-Control header value
         /// </summary>
-        public String CacheControl {
+        public string CacheControl {
             get { return Headers[CacheControlHeader]; }
             set { Headers[CacheControlHeader] = value; }
         }
@@ -33,12 +33,12 @@ namespace FryProxy.Headers {
         /// <summary>
         ///     Connection header value
         /// </summary>
-        public String Connection {
+        public string Connection {
             get { return Headers[ConnectionHeader]; }
             set { Headers[ConnectionHeader] = value; }
         }
 
-        public String ProxyConnection
+        public string ProxyConnection
         {
             get { return Headers[ProxyConnectionHeader]; }
             set { Headers[ProxyConnectionHeader] = value; }
@@ -47,17 +47,17 @@ namespace FryProxy.Headers {
         /// <summary>
         ///     Pragma header value
         /// </summary>
-        public String Pragma {
+        public string Pragma {
             get { return Headers[PragmaHeader]; }
             set { Headers[PragmaHeader] = value; }
         }
 
-        public String TransferEncoding {
+        public string TransferEncoding {
             get { return Headers[TransferEncodingHeader]; }
             set { Headers[TransferEncodingHeader] = value; }
         }
 
-        public String Trailer {
+        public string Trailer {
             get { return Headers[TrailerHeader]; }
             set { Headers[TrailerHeader] = value; }
         }

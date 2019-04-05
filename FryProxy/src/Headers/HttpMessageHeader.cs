@@ -6,31 +6,31 @@ namespace FryProxy.Headers {
 
     public class HttpMessageHeader {
 
-        private const String ChunkedTransferEncoding = "chunked";
+        private const string ChunkedTransferEncoding = "chunked";
 
         private HttpHeaders _httpHeaders;
 
-        private String _startLine;
+        private string _startLine;
 
-        public HttpMessageHeader(String startLine, HttpHeaders headers)
+        public HttpMessageHeader(string startLine, HttpHeaders headers)
         {
-            ContractUtils.Requires<ArgumentNullException>(!String.IsNullOrEmpty(startLine), "startLine");
+            ContractUtils.Requires<ArgumentNullException>(!string.IsNullOrEmpty(startLine), "startLine");
             ContractUtils.Requires<ArgumentNullException>(headers != null, "headers");
 
             _startLine = startLine;
             _httpHeaders = headers;
         }
 
-        public HttpMessageHeader(String startLine = null) {
-            _startLine = startLine ?? String.Empty;
+        public HttpMessageHeader(string startLine = null) {
+            _startLine = startLine ?? string.Empty;
             _httpHeaders = new HttpHeaders();
         }
 
-        public Boolean Chunked {
-            get { return (GeneralHeaders.TransferEncoding ?? String.Empty).Contains(ChunkedTransferEncoding); }
+        public bool Chunked {
+            get { return (GeneralHeaders.TransferEncoding ?? string.Empty).Contains(ChunkedTransferEncoding); }
         }
 
-        public virtual String StartLine {
+        public virtual string StartLine {
             get { return _startLine; }
             set { _startLine = value; }
         }
@@ -48,7 +48,7 @@ namespace FryProxy.Headers {
             get { return new EntityHeaders(Headers); }
         }
         
-        public override String ToString()
+        public override string ToString()
         {
             var sb = new StringBuilder(_startLine).AppendLine();
 

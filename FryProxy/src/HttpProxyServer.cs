@@ -20,7 +20,7 @@ namespace FryProxy {
         /// </summary>
         /// <param name="hostname">hostname to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
-        public HttpProxyServer(String hostname, HttpProxy httpProxy) : this(hostname, 0, httpProxy) {}
+        public HttpProxyServer(string hostname, HttpProxy httpProxy) : this(hostname, 0, httpProxy) {}
 
         /// <summary>
         ///     Create server bound to given hostname and port
@@ -28,7 +28,7 @@ namespace FryProxy {
         /// <param name="hostname">hostname to bind</param>
         /// <param name="port">port to bind</param>
         /// <param name="httpProxy">proxy which will handle incoming requests</param>
-        public HttpProxyServer(String hostname, Int32 port, HttpProxy httpProxy)
+        public HttpProxyServer(string hostname, int port, HttpProxy httpProxy)
             : this(new DnsEndPoint(hostname, port, AddressFamily.InterNetwork), httpProxy) {}
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace FryProxy {
         /// <summary>
         ///     Indicates if server is running and expecting requests
         /// </summary>
-        public Boolean IsListening {
+        public bool IsListening {
             get { return _worker.Active; }
         }
 
